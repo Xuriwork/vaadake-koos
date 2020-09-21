@@ -1,15 +1,38 @@
-* { margin: 0; padding: 0; list-style-type: none; }
+* {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
 
-html, body, #root {
-  height: 100%;
-  width: 100%;
+html,
+body,
+#root {
+	height: 100%;
+	width: 100%;
 }
 
 body {
-  font-family: 'Nunito', sans-serif;
-  background: linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%) no-repeat center center fixed;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  background-size: cover;
+	font-family: 'Nunito', sans-serif;
+	/* background: linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%) no-repeat center center fixed; */
+	background: rgb(237, 135, 112);
+	background: -moz-linear-gradient(
+		180deg,
+		rgba(237, 135, 112, 1) 38%,
+		rgba(217, 81, 157, 1) 100%
+	);
+	background: -webkit-linear-gradient(
+		180deg,
+		rgba(237, 135, 112, 1) 38%,
+		rgba(217, 81, 157, 1) 100%
+	);
+	background: linear-gradient(
+		180deg,
+		rgba(237, 135, 112, 1) 38%,
+		rgba(217, 81, 157, 1) 100%
+	);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#ed8770",endColorstr="#d9519d",GradientType=1);
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
 }
