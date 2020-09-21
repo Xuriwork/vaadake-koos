@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import './App.scss';
 import 'notyf/notyf.min.css';
 
-import ThemeProvider from './context/ThemeContext';
+import SettingsProvider from './context/SettingsContext';
 
 import Header from './components/Header/Header';
 import JoinPage from './pages/JoinPage';
@@ -19,7 +19,7 @@ const App = () => {
 	};
 
 	return (
-		<ThemeProvider>
+		<SettingsProvider>
 			<BrowserRouter>
 				<Header roomId={info.roomId} />
 				<div className='app-component'>
@@ -30,7 +30,7 @@ const App = () => {
 					</Switch>
 				</div>
 			</BrowserRouter>
-		</ThemeProvider>
+		</SettingsProvider>
 	);
 };
 

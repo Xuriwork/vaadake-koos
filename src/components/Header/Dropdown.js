@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from 'react';
-import { useTheme } from '../../context/ThemeContext';
+import { useSettings } from '../../context/SettingsContext';
 import toggleButton from './toggleButton';
 
 const Dropdown = ({ dropdownOpen }) => {
-    const { theme, chatHidden, setTheme, setChatHidden } = useTheme();
+    const { theme, chatHidden, setTheme, setChatHidden } = useSettings();
     const toggleChatButtonRef = useRef(null);
 	const toggleDarkModeButtonRef = useRef(null);
 

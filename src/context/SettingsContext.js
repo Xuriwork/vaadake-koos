@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
-const ThemeContext = React.createContext();
+const SettingsContext = React.createContext();
 
-const ThemeProvider = ({ children }) => {
+const SettingsProvider = ({ children }) => {
 
     const [chatHidden, setChatHidden] = useState(() => {
         return localStorage.getItem('chatHidden') || false;
@@ -13,7 +13,7 @@ const ThemeProvider = ({ children }) => {
     });
 
     return (
-        <ThemeContext.Provider 
+        <SettingsContext.Provider 
         value={{ 
             theme, 
             chatHidden, 
@@ -21,12 +21,12 @@ const ThemeProvider = ({ children }) => {
             setChatHidden, 
         }}>
             {children}
-        </ThemeContext.Provider>
+        </SettingsContext.Provider>
     )
 };
 
-const useTheme = () => React.useContext(ThemeContext);
+const useSettings = () => React.useContext(SettingsContext);
 
-export { useTheme };
+export { useSettings };
 
-export default ThemeProvider;
+export default SettingsProvider;
