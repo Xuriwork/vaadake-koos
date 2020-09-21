@@ -138,9 +138,6 @@ export class VideoRoom extends Component {
 	};
 
 	syncTime = (currentTime) => {
-		console.log(this.player.getCurrentTime());
-		console.log(currentTime);
-
 		if (
 			this.player.getCurrentTime() < currentTime - 0.5 ||
 			this.player.getCurrentTime() > currentTime + 0.5

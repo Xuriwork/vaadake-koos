@@ -1,9 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Logo from '../assets/vaadake_koos_logo.svg';
 import { Link } from 'react-router-dom';
+import { Notyf } from 'notyf';
+
 import { useTheme } from '../context/ThemeContext';
 import toggleButton from './toggleButton';
+
+import Logo from '../assets/vaadake_koos_logo.svg';
+import LinksIcon from '../assets/links-line.svg';
  
+const notyf = new Notyf({
+	duration: 2500,
+	position: {
+		x: 'right',
+		y: 'bottom',
+	},
+});
+
 const Header = ({ roomId }) => {
 	const { theme, chatHidden, setTheme, setChatHidden } = useTheme();
 	const toggleChatButtonRef = useRef(null);
@@ -45,6 +57,11 @@ const Header = ({ roomId }) => {
 		roomIdInputRef.current.select();
 		document.execCommand('copy');
 		e.target.focus();
+		notyf.success('Copied to clipboard 📋')
+	};
+
+	const handleCreateInviteCode = () => {
+		console.log('Created, actually not yet...');
 	};
 
 	return (
@@ -53,13 +70,18 @@ const Header = ({ roomId }) => {
 				<img src={Logo} alt='logo' className='logo' />
 			</Link>
 			{roomId && (
-				<input
-					ref={roomIdInputRef}
-					defaultValue={roomId}
-					readOnly={true}
-					className='show-connected-roomId-input'
-					onClick={copyToClipboard}
-				/>
+				<div className='roomId-code-container'>
+					<button onClick={handleCreateInviteCode}>
+						<img src={LinksIcon} alt='Get invite link' />
+					</button>
+					<input
+						ref={roomIdInputRef}
+						defaultValue={roomId}
+						readOnly={true}
+						className='show-connected-roomId-input'
+						onClick={copyToClipboard}
+					/>
+				</div>
 			)}
 			<button onClick={toggleDropdown} className='settings-button'>
 				<svg

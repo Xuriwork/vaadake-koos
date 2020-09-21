@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 
 import './App.scss';
+import 'notyf/notyf.min.css';
 
 import ThemeProvider from './context/ThemeContext';
 

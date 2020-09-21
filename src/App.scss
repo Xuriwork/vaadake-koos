@@ -78,7 +78,7 @@ input {
 		background-color: var(--dropdown-theme-color);
 
 		svg {
-			vertical-align: -10px;
+			vertical-align: middle;
 			width: 20px;
 		}
 	}
@@ -96,15 +96,34 @@ input {
 		box-shadow: rgba(240, 46, 170, 0.4) 5px 5px, rgba(240, 46, 170, 0.3) 10px 10px, rgba(240, 46, 170, 0.2) 15px 15px, rgba(240, 46, 170, 0.1) 20px 20px, rgba(240, 46, 170, 0.05) 25px 25px;
 	}
 
-	.show-connected-roomId-input {
+	.roomId-code-container {
+		@extend %flex-complete-center-row;
 		margin-left: auto;
-		margin-right: 15px;
+		margin-right: 10px;
+		border-radius: 10px;
+
+		button {
+			width: 30px;
+			height: 30px;
+			margin-right: 10px;
+			border: 2px solid #f3b0a771;
+			
+			img {
+				vertical-align: middle;
+				width: 20px;
+			}
+		}
+	}
+
+	.show-connected-roomId-input {
+		height: 30px;
 		padding: 6px 10px;
 		border-radius: 5px;
 		border: 2px solid transparent;
 		cursor: pointer;
 		font-size: 0.9em;
-		background-color: #e9a7fa83;
+		background-color: #f3b0a771;
+		box-sizing: border-box;
 		
 		&:hover {
 			border: 2px solid  #f3567d;
@@ -234,7 +253,7 @@ input {
 		margin-top: 20px;
 
 		svg {
-			vertical-align: -10px;
+			vertical-align: middle;
 		}
 	}
 }
