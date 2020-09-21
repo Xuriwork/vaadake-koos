@@ -23,6 +23,7 @@ const JoinPage = ({ handleSetCredentials }) => {
         
         if (username.trim() === '' || roomId.trim() === '') return;
         if (!/^[a-zA-Z0-9_-]{1,30}$/.test(username)) return;
+        if (roomId.length > 150) return;
 
         handleSetCredentials(username, roomId);
         history.push('/');

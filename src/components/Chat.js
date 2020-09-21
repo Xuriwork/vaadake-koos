@@ -34,9 +34,9 @@ const Chat = ({ messages, sendMessage, users }) => {
 					<div
 						className={
 							message.type === 'SERVER_USER-JOINED'
-								? 'SERVER_USER-JOINED message'
+								? 'SERVER_USER-JOINED SERVER_MESSAGE message'
 								: message.type === 'SERVER_USER-LEFT'
-								? 'SERVER_USER-LEFT message'
+								? 'SERVER_USER-LEFT SERVER_MESSAGE message'
 								: 'message'
 						}
 						key={index}

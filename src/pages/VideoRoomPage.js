@@ -173,7 +173,7 @@ export class VideoRoom extends Component {
 		
 		return (
 			<div className='room-page'>
-				<div className='room-page-children-container'>
+				<div className='video-and-chat-container'>
 					<div className='video-and-input-container'>
 						<ReactPlayer 
 							url={videoURL} 
