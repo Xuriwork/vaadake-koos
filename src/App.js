@@ -6,7 +6,7 @@ import 'notyf/notyf.min.css';
 
 import ThemeProvider from './context/ThemeContext';
 
-import Header from './components/Header';
+import Header from './components/Header/Header';
 import JoinPage from './pages/JoinPage';
 import RoomPage from './pages/VideoRoomPage';
 import NotFoundPage from './pages/NotFoundPage';
