@@ -38,9 +38,6 @@ const Header = ({ roomId }) => {
 			</Link>
 			{roomId && (
 				<div className='roomId-code-container'>
-					<button onClick={handleCreateInviteCode}>
-						<img src={LinksIcon} alt='Get invite link' />
-					</button>
 					<input
 						ref={roomIdInputRef}
 						defaultValue={roomId}
@@ -48,6 +45,9 @@ const Header = ({ roomId }) => {
 						className='show-connected-roomId-input'
 						onClick={copyToClipboard}
 					/>
+					<button onClick={handleCreateInviteCode}>
+						<img src={LinksIcon} alt='Get invite link' />
+					</button>
 				</div>
 			)}
 			<button onClick={toggleDropdown} className='settings-button'>

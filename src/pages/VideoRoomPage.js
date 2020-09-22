@@ -1,8 +1,8 @@
 /* eslint-disable no-useless-escape */
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
+import io from 'socket.io-client';
 import ReactPlayer from 'react-player/youtube';
-import Loading from '../components/Loading';
 
 import {
 	PLAY,
@@ -18,11 +18,11 @@ import {
 	SEND_MESSAGE,
 } from '../Constants';
 
-import io from 'socket.io-client';
+import { SettingsContext } from '../context/SettingsContext';
+import Loading from '../components/Loading';
 import Chat from '../components/Chat';
 
-console.log(process.env.NODE_ENV);
-const socketUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : '/';
+const socketUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : process.env.REACT_APP_GAE_API;
 const URL_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)/;
 
 const youtubeConfig = {
@@ -37,6 +37,8 @@ const youtubeConfig = {
 };
 
 export class VideoRoom extends Component {
+	static contextType = SettingsContext;
+
 	state = {
 		socket: null,
 		videoURL: 'https://www.youtube.com/watch?v=_hql7mO-zaA',
@@ -56,15 +58,20 @@ export class VideoRoom extends Component {
 		this.setState({ loading: false });
 	};
 
+	componentWillUnmount() {
+		if (this.state.socket) {
+			this.state.socket.removeAllListeners();
+		}
+	};
+
+	ref = player => this.player = player;
+
 	onSocketMethods = (socket) => {
 		const { roomId, username } = this.props;
+		
 		socket.on('connect', () => {
 			socket.emit(JOIN_ROOM, { roomId, username });
 			socket.emit(ASK_FOR_VIDEO_INFORMATION);
-		});
-
-		socket.on('disconnect', () => {
-			console.log('Disconnected');
 		});
 
 		socket.on(PLAY, () => {
@@ -134,8 +141,9 @@ export class VideoRoom extends Component {
 		const socket = io(socketUrl);
 		this.setState({ socket });
 		this.onSocketMethods(socket);
-		this.syncTime();
 	};
+
+	onError = (error) => console.log(error);
 
 	syncTime = (currentTime) => {
 		if (
@@ -152,16 +160,16 @@ export class VideoRoom extends Component {
 		this.state.socket.emit(NEW_VIDEO, this.urlInput.value);
 	};
 
-	onError = (error) => console.log(error);
-
 	sendMessage = (message) => {
 		this.state.socket.emit(SEND_MESSAGE, {
 			content: message,
 			username: this.props.username,
 		});
-    };
-
-	ref = player => this.player = player;
+	};
+	
+	handleTest = () => {
+		console.log(this.state.socket);
+	};
 	
 	render() {
 		if (this.state.loading) return <Loading />;
@@ -182,6 +190,7 @@ export class VideoRoom extends Component {
 							onPlay={this.handlePlay}
 							height='100%'
 							width='100%'
+							className='youtube-video-component'
 							config={{
 								youtube: youtubeConfig
 							}}
@@ -196,11 +205,15 @@ export class VideoRoom extends Component {
 							<button onClick={this.handleChangeVideo}>Change Video</button>
 						</div>
 					</div>
-					<Chat
-						messages={messages}
-						users={users}
-						sendMessage={this.sendMessage}
-					/>
+					{
+						!this.context.chatHidden && (
+							<Chat
+								messages={messages}
+								users={users}
+								sendMessage={this.sendMessage}
+							/>
+						)
+					}
 				</div>
 			</div>
 		);

@@ -59,12 +59,12 @@ input {
 
 .header {
 	background-color: #ffffff;
-	height: 8vh;
+	height: 70px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	position: relative;
-	padding: 20px;
+	padding: 0 20px;
 	box-sizing: border-box;
 
 	.logo {
@@ -94,6 +94,7 @@ input {
 		background-color: #ffffff;
 		border: 2px solid var(--dropdown-theme-color);
 		box-shadow: rgba(240, 46, 170, 0.4) 5px 5px, rgba(240, 46, 170, 0.3) 10px 10px, rgba(240, 46, 170, 0.2) 15px 15px, rgba(240, 46, 170, 0.1) 20px 20px, rgba(240, 46, 170, 0.05) 25px 25px;
+		z-index: 2;
 	}
 
 	.roomId-code-container {
@@ -105,9 +106,9 @@ input {
 		button {
 			width: 30px;
 			height: 30px;
-			margin-right: 10px;
-			border: 2px solid #f3b0a771;
-			
+			margin-left: 10px;
+			background-color: var(--dropdown-theme-color);
+
 			img {
 				vertical-align: middle;
 				width: 20px;
@@ -172,7 +173,8 @@ input {
 }
 
 .app-component {
-	height: calc(100% - 8vh);
+	max-height: calc(100% - 70px);
+	height: 100%;
 }
 
 .loading-screen {
@@ -319,6 +321,7 @@ input {
 
 .video-and-chat-container {
 	@extend %flex-complete-center-row;
+	max-height: 100%;
 	height: 750px;
 	width: 100%;
 	max-width: 95%;
@@ -327,11 +330,11 @@ input {
 }
 
 .video-and-input-container {
-	width: 100%;
 	background-color: #ffffff;
 	border-radius: 10px 0 0 10px;
 	padding: 15px;
 	box-sizing: border-box;
+	width: 100%;
 	height: 100%;
 	max-height: 740px;
 	display: flex;
@@ -359,8 +362,8 @@ input {
 	}
 }
 
-.youtube-video-component {
-	border-radius: 10px;
+.youtube-video-component iframe {
+	border-radius: 5px;
 }
 
 .change-video-container {
@@ -530,17 +533,18 @@ input {
 @media (max-width: 800px) {
 	.video-and-chat-container {
 		flex-direction: column;
-		height: 900px;
-		max-height: 95%;
+		height: 100%;
+		max-width: 100%;
+		box-sizing: border-box;
 	}
 
 	.video-and-input-container {
-		border-radius: 10px;
-		border-radius: 10px 10px 0 0;
+		border-radius: 0;
+		padding: 5px;
 	}
 
 	.chat-container {
 		max-width: 100%;
-		border-radius: 0 0 10px 10px;
+		border-radius: 0;
 	}
 }
