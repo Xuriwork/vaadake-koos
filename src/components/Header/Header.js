@@ -27,9 +27,7 @@ const Header = ({ roomId }) => {
 		notyf.success('Copied to clipboard 📋')
 	};
 
-	const handleCreateInviteCode = () => {
-		console.log('Created, actually not yet...');
-	};
+	const handleCreateInviteCode = () => notyf.error('This is disabled for now');
 
 	return (
 		<header className='header'>

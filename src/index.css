@@ -2,6 +2,7 @@
 	margin: 0;
 	padding: 0;
 	list-style-type: none;
+	font-family: 'Nunito', sans-serif;
 }
 
 html,
@@ -12,7 +13,7 @@ body,
 }
 
 body {
-	font-family: 'Nunito', sans-serif !important;
+	font-family: 'Nunito', sans-serif;
 	/* background: linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%) no-repeat center center fixed; */
 	background: rgb(237, 135, 112);
 	background: -moz-linear-gradient(

@@ -3,8 +3,6 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import io from 'socket.io-client';
 import YouTube from 'react-youtube';
-import ResponsiveEmbed from 'react-bootstrap/ResponsiveEmbed';
-import './Bootstrap.scss';
 
 import {
 	PLAY,
@@ -214,16 +212,17 @@ export class VideoRoom extends Component {
 		return (
 			<div className='room-page'>
 				<div className='video-and-chat-container'>
-					<div className='bootstrap-iso video-and-input-container'>
-						<ResponsiveEmbed aspectRatio='16by9'>
+					<div className='video-and-input-container'>
+						<div className='embed-responsive embed-responsive-16by9'>
 							<YouTube
 								videoId='_hql7mO-zaA'
 								opts={youtubeConfig}
 								onStateChange={this.onStateChanged}
 								onReady={this.onReady}
 								onError={this.onError}
+								className='embed-responsive'
 							/>
-						</ResponsiveEmbed>
+						</div>
 						<div className='change-video-container'>
 							<input
 								type='text'
