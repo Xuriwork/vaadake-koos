@@ -95,6 +95,17 @@ input {
 		border: 2px solid var(--dropdown-theme-color);
 		box-shadow: rgba(240, 46, 170, 0.4) 5px 5px, rgba(240, 46, 170, 0.3) 10px 10px, rgba(240, 46, 170, 0.2) 15px 15px, rgba(240, 46, 170, 0.1) 20px 20px, rgba(240, 46, 170, 0.05) 25px 25px;
 		z-index: 2;
+
+		span {
+			display: flex;
+			align-items: center;
+			margin-bottom: 5px;
+
+			img {
+				margin-right: 5px;
+				width: 22px;
+			}
+		}
 	}
 
 	.roomId-code-container {
@@ -123,7 +134,7 @@ input {
 		border: 2px solid transparent;
 		cursor: pointer;
 		font-size: 0.9em;
-		background-color: #f3b0a771;
+		background-color: #f02ea94b;
 		box-sizing: border-box;
 		
 		&:hover {
@@ -148,6 +159,11 @@ input {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+		
+
+		&:not(:last-of-type) {
+			margin-bottom: 15px;
+		}
 
 		button {
 			height: 30px;
@@ -230,6 +246,26 @@ input {
 	height: 100%;
 }
 
+.room-page {
+	padding: 20px;
+	box-sizing: border-box;
+}
+
+.floating-action-button {
+	position: absolute;
+	width: 50px;
+	height: 50px;
+	bottom: 10px;
+	left: 10px;
+	border-radius: 50%;
+	background-color: #ffffff;
+
+	svg {
+		width: 30px;
+		height: 30px;
+	}
+}
+
 .not-found-page {
 	color: #ffffff;
 	text-align: center;
@@ -276,6 +312,7 @@ input {
 			display: flex;
 			flex-direction: column;
 			height: 100%;
+			line-height: normal;
 
 			input {
 				background-color: rgb(235, 235, 235);
@@ -340,11 +377,7 @@ input {
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
-
-	> div {
-		display: flex;
-		position: relative;
-	}
+	overflow: hidden;
 
 	input {
 		@extend %video-page-input;
@@ -362,14 +395,10 @@ input {
 	}
 }
 
-.youtube-video-component iframe {
-	border-radius: 5px;
-}
-
 .change-video-container {
-	position: absolute;
 	justify-content: space-between;
 	margin-top: 10px;
+	display: flex;
 }
 
 .chat-container {
@@ -531,6 +560,10 @@ input {
 }
 
 @media (max-width: 800px) {
+	.room-page {
+		padding: 0;
+	}
+
 	.video-and-chat-container {
 		flex-direction: column;
 		height: 100%;

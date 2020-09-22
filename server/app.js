@@ -1,22 +1,21 @@
 const express = require('express');
 const app = express();
 const server = require('http').Server(app);
-const io = (module.exports.io = require('socket.io')(server));
+const io = module.exports.io = require('socket.io')(server);
 
 const {
 	PLAY,
 	PAUSE,
 	SYNC_TIME,
 	NEW_VIDEO,
-	ASK_FOR_VIDEO_INFORMATION,
+	GET_VIDEO_INFORMATION,
 	SYNC_VIDEO_INFORMATION,
 	JOIN_ROOM,
 	SEND_MESSAGE,
 	RECEIVED_MESSAGE,
 	SEND_USERNAME,
-	ASK_FOR_USERNAME,
-} = require('./Constants');
-
+	GET_USERNAME,
+} = require('./Commands');
 const PORT = process.env.PORT || 5000;
 
 app.use(express.static(__dirname + '/../../build'));
@@ -33,7 +32,7 @@ io.on('connection', function(socket) {
       content: socket.username + " joined the room."
     });
 
-    io.in(socket.room).emit(ASK_FOR_USERNAME);
+    io.in(socket.room).emit(GET_USERNAME);
   });
   
   socket.on(PLAY, () => {
@@ -52,8 +51,8 @@ io.on('connection', function(socket) {
     io.to(socket.room).emit(NEW_VIDEO, videoURL);
   });
 
-  socket.on(ASK_FOR_VIDEO_INFORMATION, () => {
-    socket.to(socket.room).emit(ASK_FOR_VIDEO_INFORMATION);
+  socket.on(GET_VIDEO_INFORMATION, () => {
+    socket.to(socket.room).emit(GET_VIDEO_INFORMATION);
   });
 
   socket.on(SYNC_VIDEO_INFORMATION, (data) => {
@@ -74,7 +73,7 @@ io.on('connection', function(socket) {
         content: socket.username + " disconnected."
       });
 
-      io.in(socket.room).emit(ASK_FOR_USERNAME);
+      io.in(socket.room).emit(GET_USERNAME);
     });
   });
 

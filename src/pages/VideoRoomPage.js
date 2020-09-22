@@ -2,27 +2,29 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import io from 'socket.io-client';
-import ReactPlayer from 'react-player/youtube';
+import YouTube from 'react-youtube';
+import ResponsiveEmbed from 'react-bootstrap/ResponsiveEmbed';
+import './Bootstrap.scss';
 
 import {
 	PLAY,
 	PAUSE,
 	SYNC_TIME,
 	NEW_VIDEO,
-	ASK_FOR_VIDEO_INFORMATION,
+	GET_VIDEO_INFORMATION,
 	SYNC_VIDEO_INFORMATION,
 	JOIN_ROOM,
 	RECEIVED_MESSAGE,
-	ASK_FOR_USERNAME,
+	GET_USERNAME,
 	SEND_USERNAME,
 	SEND_MESSAGE,
-} from '../Constants';
+} from '../Commands';
 
 import { SettingsContext } from '../context/SettingsContext';
 import Loading from '../components/Loading';
 import Chat from '../components/Chat';
 
-const socketUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : process.env.REACT_APP_GAE_API;
+const socketURL = process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : process.env.REACT_APP_GAE_API_URL;
 const URL_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)/;
 
 const youtubeConfig = {
@@ -41,13 +43,13 @@ export class VideoRoom extends Component {
 
 	state = {
 		socket: null,
+		player: null,
 		videoURL: 'https://www.youtube.com/watch?v=_hql7mO-zaA',
 		messages: [],
 		users: [],
 		played: 0,
 		duration: 0,
 		loading: true,
-		playing: true,
 	};
 
 	componentDidMount() {
@@ -64,22 +66,21 @@ export class VideoRoom extends Component {
 		}
 	};
 
-	ref = player => this.player = player;
-
 	onSocketMethods = (socket) => {
 		const { roomId, username } = this.props;
+		const { player } = this.state;
 		
 		socket.on('connect', () => {
 			socket.emit(JOIN_ROOM, { roomId, username });
-			socket.emit(ASK_FOR_VIDEO_INFORMATION);
+			socket.emit(GET_VIDEO_INFORMATION);
 		});
 
 		socket.on(PLAY, () => {
-			this.setState({ playing: true });
+			player.playVideo();
 		});
 
 		socket.on(PAUSE, () => {
-			this.setState({ playing: false });
+			player.pauseVideo()
 		});
 
 		socket.on(SYNC_TIME, (currentTime) => {
@@ -87,19 +88,26 @@ export class VideoRoom extends Component {
 		});
 
 		socket.on(NEW_VIDEO, (videoURL) => {
-			this.setState({ videoURL });
+			player.loadVideoById({
+				videoId: this.getYoutubeIdByUrl(videoURL)
+			});
+			this.setState({ videoURL: '' });
 		});
 
-		socket.on(ASK_FOR_VIDEO_INFORMATION, () => {
+		socket.on(GET_VIDEO_INFORMATION, () => {
 			const data = {
-				videoURL: this.player.props.url,
-				currentTime: this.player.getCurrentTime(),
-			};
+				videoURL: player.getVideoUrl(),
+				currentTime: player.getCurrentTime()
+			}
 			socket.emit(SYNC_VIDEO_INFORMATION, data);
 		});
 
 		socket.on(SYNC_VIDEO_INFORMATION, (data) => {
-			this.syncTime(data.currentTime);
+			const videoId = this.getYoutubeIdByUrl(data.videoURL)
+			player.loadVideoById({
+				videoId,
+				startSeconds: data.currentTime
+			});
 		});
 
 		socket.on(RECEIVED_MESSAGE, (data) => {
@@ -115,7 +123,7 @@ export class VideoRoom extends Component {
 			});
 		});
 
-		socket.on(ASK_FOR_USERNAME, () => {
+		socket.on(GET_USERNAME, () => {
 			this.setState({ users: [] });
 			this.state.socket.emit(SEND_USERNAME, this.props.username);
 		});
@@ -126,36 +134,41 @@ export class VideoRoom extends Component {
 			});
 		});
 	};
-	
-	handlePause = () => {
-		this.state.socket.emit(PAUSE);
-	};
-	
-	handlePlay = () => {
-		this.state.socket.emit(PLAY);
-	};
 
-	handlePlayPause = () => this.setState({ playing: !this.state.playing });
+	onReady = (e) => {
+		this.setState({ player: e.target });
 
-	onReady = () => {
-		const socket = io(socketUrl);
+		const socket = io(socketURL);
 		this.setState({ socket });
 		this.onSocketMethods(socket);
 	};
 
 	onError = (error) => console.log(error);
 
+	getYoutubeIdByUrl = (url) => {
+		let id = '';
+		url = url.replace(/(>|<)/gi,'').split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
+	
+		if(url[2] !== undefined) {
+			id = url[2].split(/[^0-9a-z_-]/i);
+			id = id[0];
+		} else id = url;
+		return id;
+	};
+
 	syncTime = (currentTime) => {
 		if (
-			this.player.getCurrentTime() < currentTime - 0.5 ||
-			this.player.getCurrentTime() > currentTime + 0.5
+			this.state.player.getCurrentTime() < currentTime - 0.5 ||
+			this.state.player.getCurrentTime() > currentTime + 0.5
 		) {
-			this.player.seekTo(currentTime, 'seconds');
+			this.state.player.seekTo(currentTime);
+			this.state.player.playVideo();
 		}
 	};
 
 	handleChangeVideo = (e) => {
 		e.preventDefault();
+		console.log(this.urlInput.value);
 		if (!URL_REGEX.test(this.urlInput.value)) return;
 		this.state.socket.emit(NEW_VIDEO, this.urlInput.value);
 	};
@@ -166,54 +179,70 @@ export class VideoRoom extends Component {
 			username: this.props.username,
 		});
 	};
-	
-	handleTest = () => {
-		console.log(this.state.socket);
+
+	onStateChanged = () => {
+		const { player, socket } = this.state;
+
+		switch (player.getPlayerState()) {
+		  case -1:
+			socket.emit(PLAY);
+			break;
+		  case 0:
+			break;
+		  case 1:
+			socket.emit(SYNC_TIME, player.getCurrentTime());
+			socket.emit(PLAY);
+			break;
+		  case 2:
+			socket.emit(PAUSE);
+			break;
+		  case 3:
+			socket.emit(SYNC_TIME, player.getCurrentTime());
+			break;
+		  case 5:
+			break;
+		  default:
+			break;
+		}
 	};
 	
 	render() {
 		if (this.state.loading) return <Loading />;
 		
-		const { messages, videoURL, playing, users } = this.state;
+		const { messages, users } = this.state;
 		
 		return (
 			<div className='room-page'>
 				<div className='video-and-chat-container'>
-					<div className='video-and-input-container'>
-						<ReactPlayer 
-							url={videoURL} 
-							ref={this.ref}
-							playing={playing}
-							onError={this.onError}
-							onReady={this.onReady}
-							onPause={this.handlePause}
-							onPlay={this.handlePlay}
-							height='100%'
-							width='100%'
-							className='youtube-video-component'
-							config={{
-								youtube: youtubeConfig
-							}}
-						/>
+					<div className='bootstrap-iso video-and-input-container'>
+						<ResponsiveEmbed aspectRatio='16by9'>
+							<YouTube
+								videoId='_hql7mO-zaA'
+								opts={youtubeConfig}
+								onStateChange={this.onStateChanged}
+								onReady={this.onReady}
+								onError={this.onError}
+							/>
+						</ResponsiveEmbed>
 						<div className='change-video-container'>
 							<input
 								type='text'
 								placeholder='Enter URL'
 								pattern='https://.*'
-								ref={input => { this.urlInput = input }}
+								ref={(input) => {
+									this.urlInput = input;
+								}}
 							/>
 							<button onClick={this.handleChangeVideo}>Change Video</button>
 						</div>
 					</div>
-					{
-						!this.context.chatHidden && (
-							<Chat
-								messages={messages}
-								users={users}
-								sendMessage={this.sendMessage}
-							/>
-						)
-					}
+					{!this.context.chatHidden && (
+						<Chat
+							messages={messages}
+							users={users}
+							sendMessage={this.sendMessage}
+						/>
+					)}
 				</div>
 			</div>
 		);

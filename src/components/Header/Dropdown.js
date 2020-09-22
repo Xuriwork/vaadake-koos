@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import toggleButton from './toggleButton';
+import LayoutIcon from '../../assets/layout-5-fill.svg';
+import PaletteIcon from '../../assets/palette-fill.svg';
 
 const Dropdown = ({ dropdownOpen }) => {
     const { theme, chatHidden, setTheme, setChatHidden } = useSettings();
@@ -40,7 +42,10 @@ const Dropdown = ({ dropdownOpen }) => {
 		<>
 			{dropdownOpen && (
 				<div className='dropdown'>
-					<h3>Layout Settings</h3>
+					<span>
+						<img src={LayoutIcon} alt='layout' />
+						<h3>Layout Settings</h3>
+					</span>
 					<div className='settings-option-container'>
 						<p>Chat</p>
 						<button onClick={toggleShowChat} ref={toggleChatButtonRef}>
@@ -48,7 +53,10 @@ const Dropdown = ({ dropdownOpen }) => {
 							<span>Hide</span>
 						</button>
 					</div>
-					<h3>Interface Settings</h3>
+					<span>
+						<img src={PaletteIcon} alt='palette' />
+						<h3>Interface Settings</h3>
+					</span>
 					<div className='settings-option-container'>
 						<p>Toggle Dark Mode</p>
 						<button onClick={toggleDarkMode} ref={toggleDarkModeButtonRef}>
