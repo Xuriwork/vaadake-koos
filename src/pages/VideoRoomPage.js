@@ -45,8 +45,6 @@ export class VideoRoom extends Component {
 		videoURL: 'https://www.youtube.com/watch?v=_hql7mO-zaA',
 		messages: [],
 		users: [],
-		played: 0,
-		duration: 0,
 		loading: true,
 	};
 
