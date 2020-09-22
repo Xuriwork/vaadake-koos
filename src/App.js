@@ -24,7 +24,7 @@ const App = () => {
 				<Header roomId={info.roomId} />
 				<div className='app-component'>
 					<Switch>
-						<Route exact path='/' component={() => <RoomPage username={info.username} roomId={info.roomId} />} />
+						<Route exact path='/' component={() => <RoomPage username={info.username} roomId={info.roomId} setInfo={setInfo} />} />
 						<Route path='/join' component={() => <JoinPage handleSetCredentials={handleSetCredentials} />} />
 						<Route component={NotFoundPage} />
 					</Switch>

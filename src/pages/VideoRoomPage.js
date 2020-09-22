@@ -59,6 +59,7 @@ export class VideoRoom extends Component {
 	componentWillUnmount() {
 		if (this.state.socket) {
 			this.state.socket.removeAllListeners();
+			this.props.setInfo({});
 		}
 	};
 
