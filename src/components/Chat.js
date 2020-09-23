@@ -1,8 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import shortid from 'shortid';
+import DownArrowIcon from '../assets/arrow-down-circle-fill.svg';
 
-const Chat = ({ messages, sendMessage, users }) => {
+const Chat = ({ messages, sendMessage, users, socket }) => {
 	const [message, setMessage] = useState('');
+	const [newMessagePopup, setNewMessagePopup] = useState(false);
+	const chatContainerRef = useRef(null);
+	
+	const scrollToBottom = () => {
+		const chatContainer = chatContainerRef.current;
+		const { scrollHeight, scrollTop, offsetHeight } = chatContainer;
+		chatContainer.maxScrollTop = scrollHeight - offsetHeight;
+
+		if (chatContainer.maxScrollTop - scrollTop <= offsetHeight) {
+			chatContainer.scroll(0, scrollHeight);
+		} else setNewMessagePopup(true);
+	};
+
+	useEffect(() => {
+		scrollToBottom();
+	}, [messages]);
+
+	const handleRemoveNewMessagesAlert = () => setNewMessagePopup(false);
 
 	const handleOnChangeMessage = (e) => setMessage(e.target.value);
 	const handleOnKeyDown = (e) => {
@@ -11,7 +30,7 @@ const Chat = ({ messages, sendMessage, users }) => {
 
 	const handleSendMessage = (e) => {
 		e.preventDefault();
-        if (message.trim() === '') return;
+        if (!socket || message.trim() === '') return;
         sendMessage(message);
         setMessage('');
 	};
@@ -29,7 +48,7 @@ const Chat = ({ messages, sendMessage, users }) => {
 					))}
 				</ul>
 			</div>
-			<div className='messages-container'>
+			<div className='messages-container' ref={chatContainerRef}>
 				{messages.map((message, index) => (
 					<div
 						className={
@@ -49,6 +68,11 @@ const Chat = ({ messages, sendMessage, users }) => {
 					</div>
 				))}
 			</div>
+			{newMessagePopup && (
+				<span className='new-messages-alert' onClick={handleRemoveNewMessagesAlert}>
+					New messages <img src={DownArrowIcon} alt='Scroll down' />{' '}
+				</span>
+			)}
 			<div className='message-input-container'>
 				<input
 					type='text'

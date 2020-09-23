@@ -17,6 +17,7 @@
     "react-player": "^2.6.2",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
+    "react-scroll-to-bottom": "^4.0.0",
     "react-youtube": "^7.12.0",
     "shortid": "^2.2.15",
     "socket.io": "^2.3.0",

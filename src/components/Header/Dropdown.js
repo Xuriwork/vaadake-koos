@@ -3,6 +3,15 @@ import { useSettings } from '../../context/SettingsContext';
 import toggleButton from './toggleButton';
 import LayoutIcon from '../../assets/layout-5-fill.svg';
 import PaletteIcon from '../../assets/palette-fill.svg';
+import { Notyf } from 'notyf';
+
+const notyf = new Notyf({
+	duration: 2500,
+	position: {
+		x: 'right',
+		y: 'bottom',
+	},
+});
 
 const Dropdown = ({ dropdownOpen }) => {
     const { theme, chatHidden, setTheme, setChatHidden } = useSettings();
@@ -35,7 +44,10 @@ const Dropdown = ({ dropdownOpen }) => {
 
 	}, [dropdownOpen, chatHidden]);
 
-    const toggleDarkMode = () => toggleButton(toggleDarkModeButtonRef, 'toggleDarkModeButton', setTheme);
+	const toggleDarkMode = () => {
+		toggleButton(toggleDarkModeButtonRef, 'toggleDarkModeButton', setTheme);
+		notyf.error('Not implemented yet, i\' like this 🤏 close.');
+	};
 	const toggleShowChat = () => toggleButton(toggleChatButtonRef, 'toggleChatButton', setChatHidden);
     
 	return (

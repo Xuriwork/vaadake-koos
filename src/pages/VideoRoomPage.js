@@ -108,16 +108,7 @@ export class VideoRoom extends Component {
 		});
 
 		socket.on(RECEIVED_MESSAGE, (data) => {
-			this.setState({
-				messages: [
-					...this.state.messages,
-					{
-						username: data.username,
-						content: data.content,
-						type: data.type
-					},
-				],
-			});
+			this.getMessages(data);
 		});
 
 		socket.on(GET_USERNAME, () => {
@@ -170,6 +161,19 @@ export class VideoRoom extends Component {
 		this.state.socket.emit(NEW_VIDEO, this.urlInput.value);
 	};
 
+	getMessages = (data) => {
+		this.setState({
+			messages: [
+				...this.state.messages,
+				{
+					username: data.username,
+					content: data.content,
+					type: data.type
+				},
+			],
+		});
+	};
+
 	sendMessage = (message) => {
 		this.state.socket.emit(SEND_MESSAGE, {
 			content: message,
@@ -206,7 +210,7 @@ export class VideoRoom extends Component {
 	render() {
 		if (this.state.loading) return <Loading />;
 		
-		const { messages, users } = this.state;
+		const { messages, users, socket } = this.state;
 		
 		return (
 			<div className='room-page'>
@@ -238,6 +242,7 @@ export class VideoRoom extends Component {
 						<Chat
 							messages={messages}
 							users={users}
+							socket={socket}
 							sendMessage={this.sendMessage}
 						/>
 					)}

@@ -1,5 +1,5 @@
 :root {
-	--dropdown-theme-color: #f02eaa;
+	--theme-color: #f02eaa;
 	--theme-color_secondary: #d9519d; 
 }
 
@@ -75,7 +75,7 @@ input {
 	.settings-button {
 		width: 30px;
 		height: 30px;
-		background-color: var(--dropdown-theme-color);
+		background-color: var(--theme-color);
 
 		svg {
 			vertical-align: middle;
@@ -92,7 +92,7 @@ input {
 		padding: 15px;
 		box-sizing: border-box;
 		background-color: #ffffff;
-		border: 2px solid var(--dropdown-theme-color);
+		border: 2px solid var(--theme-color);
 		box-shadow: rgba(240, 46, 170, 0.4) 5px 5px, rgba(240, 46, 170, 0.3) 10px 10px, rgba(240, 46, 170, 0.2) 15px 15px, rgba(240, 46, 170, 0.1) 20px 20px, rgba(240, 46, 170, 0.05) 25px 25px;
 		z-index: 2;
 
@@ -118,7 +118,7 @@ input {
 			width: 30px;
 			height: 30px;
 			margin-left: 10px;
-			background-color: var(--dropdown-theme-color);
+			background-color: var(--theme-color);
 
 			img {
 				vertical-align: middle;
@@ -143,7 +143,7 @@ input {
 	}
 
 	h3 {
-		color: var(--dropdown-theme-color);
+		color: var(--theme-color);
 		font-size: 1.05em;
 		&:not(:first-of-type) {
 			margin-top: 15px;
@@ -180,7 +180,7 @@ input {
 				color: #303030;
 
 				&.toggled {
-					background-color: var(--dropdown-theme-color);
+					background-color: var(--theme-color);
 					color: #ffffff;
 				}
 			}
@@ -443,6 +443,8 @@ input {
 	padding: 10px;
 	height: 100%;
 	box-sizing: border-box;
+	scroll-behavior: smooth;
+	position: relative;
 
 	&::-webkit-scrollbar {
 		width: 4px;
@@ -453,6 +455,27 @@ input {
 	&::-webkit-scrollbar-thumb {
 		background-color: var(--theme-color_secondary);
 		border-radius: 5px;
+	}
+}
+
+.new-messages-alert {
+	@extend %flex-complete-center-row;
+	background-color: #22eaaa;
+	color: #ffffff;
+	width: 100%;
+	position: relative;
+	bottom: 0;
+	left: 0;
+	padding: 6px 0;
+	box-sizing: border-box;
+	border-radius: 0 0 5px 5px;
+	text-align: center;
+	font-weight: 600;
+	cursor: pointer;
+
+	img {
+		margin-left: 10px;
+		width: 26px;
 	}
 }
 
@@ -598,5 +621,6 @@ input {
 	.chat-container {
 		max-width: 100%;
 		border-radius: 0;
+		max-height: 50vh;
 	}
 }
