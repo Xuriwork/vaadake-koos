@@ -16,9 +16,11 @@ const notyf = new Notyf({
 
 const Header = ({ roomId }) => {
 	const roomIdInputRef = useRef(null);
+	const dropdownButtonRef = useRef(null);
 	const [dropdownOpen, setDropdownOpen] = useState(false);
     
 	const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
+	const closeDropdown = () => setTimeout(() => setDropdownOpen(false), 250);
 
 	const copyToClipboard = (e) => {
 		roomIdInputRef.current.select();
@@ -48,7 +50,7 @@ const Header = ({ roomId }) => {
 					</button>
 				</div>
 			)}
-			<button onClick={toggleDropdown} className='settings-button'>
+			<button ref={dropdownButtonRef} onClick={toggleDropdown} className='settings-button'>
 				<svg
 					xmlns='http://www.w3.org/2000/svg'
 					viewBox='0 0 24 24'
@@ -62,7 +64,10 @@ const Header = ({ roomId }) => {
 					/>
 				</svg>
 			</button>
-			<Dropdown dropdownOpen={dropdownOpen} />
+			{
+
+			dropdownOpen && <Dropdown dropdownOpen={dropdownOpen} closeDropdown={closeDropdown} dropdownButtonRef={dropdownButtonRef} />
+			}
 		</header>
 	);
 };

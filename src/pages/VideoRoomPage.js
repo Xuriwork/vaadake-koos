@@ -72,21 +72,17 @@ export class VideoRoom extends Component {
 			socket.emit(GET_VIDEO_INFORMATION);
 		});
 
-		socket.on(PLAY, () => {
-			player.playVideo();
-		});
+		//socket.on('disconnect', () => socket.open());
 
-		socket.on(PAUSE, () => {
-			player.pauseVideo()
-		});
+		socket.on(PLAY, () => player.playVideo());
 
-		socket.on(SYNC_TIME, (currentTime) => {
-			this.syncTime(currentTime);
-		});
+		socket.on(PAUSE, () => player.pauseVideo());
+
+		socket.on(SYNC_TIME, (currentTime) => this.syncTime(currentTime));
 
 		socket.on(NEW_VIDEO, (videoURL) => {
 			player.loadVideoById({
-				videoId: this.getYoutubeIdByUrl(videoURL)
+				videoId: this.convertURLToYoutubeVideoId(videoURL)
 			});
 			this.setState({ videoURL: '' });
 		});
@@ -100,16 +96,14 @@ export class VideoRoom extends Component {
 		});
 
 		socket.on(SYNC_VIDEO_INFORMATION, (data) => {
-			const videoId = this.getYoutubeIdByUrl(data.videoURL)
+			const videoId = this.convertURLToYoutubeVideoId(data.videoURL)
 			player.loadVideoById({
 				videoId,
 				startSeconds: data.currentTime
 			});
 		});
 
-		socket.on(RECEIVED_MESSAGE, (data) => {
-			this.getMessages(data);
-		});
+		socket.on(RECEIVED_MESSAGE, (data) => this.getMessages(data));
 
 		socket.on(GET_USERNAME, () => {
 			this.setState({ users: [] });
@@ -133,7 +127,7 @@ export class VideoRoom extends Component {
 
 	onError = (error) => console.log(error);
 
-	getYoutubeIdByUrl = (url) => {
+	convertURLToYoutubeVideoId = (url) => {
 		let id = '';
 		url = url.replace(/(>|<)/gi,'').split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
 	
