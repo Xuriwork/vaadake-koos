@@ -1,11 +1,30 @@
-import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
 import shortid from 'shortid';
+import queryString from 'query-string';
 
 const JoinPage = ({ handleSetCredentials }) => {
     const history = useHistory();
+    const location = useLocation();
     const [username, setUsername] = useState('');
     const [roomId, setRoomId] = useState('');
+    const [hideRoomIdInput, setHideRoomIdInput] = useState(false);
+    const formContainerStyles = hideRoomIdInput ? 'join-form-container show-only-name-input' : 'join-form-container';
+
+    useEffect(() => {
+        const getRoomId = () => {
+            const { roomId } = queryString.parse(location.search);
+            return roomId ?? null;
+        };
+
+        const _roomId = getRoomId();
+
+        if (_roomId) {
+            setRoomId(_roomId);
+            setHideRoomIdInput(true);
+        };
+
+    }, [location.search]);
 
     const handleOnChangeRoomId = (e) => setRoomId(e.target.value);
     const handleOnChangeUsername = (e) => setUsername(e.target.value);
@@ -31,11 +50,25 @@ const JoinPage = ({ handleSetCredentials }) => {
 
     return (
         <div className='join-page'>
-            <div className='join-form-container'>
+            <div className={formContainerStyles}>
                 <form>
-                    <label>Room Id</label>
-                    <input type='text' name='roomId' value={roomId} onChange={handleOnChangeRoomId} />
-                    <button className='generate-random-roomId-button' onClick={handleGenerateRandomRoomId}>Generate Random Room Id</button>
+                    {!hideRoomIdInput && (
+                        <>
+                            <label>Room Id</label>
+                            <input 
+                                type='text' 
+                                name='roomId' 
+                                value={roomId} 
+                                onChange={handleOnChangeRoomId} 
+                            />
+                            <button 
+                                className='generate-random-roomId-button' 
+                                onClick={handleGenerateRandomRoomId}
+                            >
+                                Generate Random Room Id
+                            </button>
+                        </>
+                    )}
                     <label>Name</label>
                     <input type='text' name='name' value={username} onChange={handleOnChangeUsername} />
                     <button className='join-button' onClick={joinRoom}>Join</button>

@@ -7,9 +7,8 @@ import toggleButton from './toggleButton';
 import DropdownItem from './DropdownItem';
 import VolumeSlider from './VolumeSlider';
 
+import { LayoutIcon, PaletteIcon } from './DropdownIcons';
 import ToggleSoundEffect from '../../../assets/audio/switch-sound.mp3';
-import LayoutIcon from '../../../assets/icons/layout-5-fill.svg';
-import PaletteIcon from '../../../assets/icons/palette-fill.svg';
 
 const notyf = new Notyf({
 	duration: 2500,

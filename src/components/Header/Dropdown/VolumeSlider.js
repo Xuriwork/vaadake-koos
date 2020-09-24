@@ -1,6 +1,6 @@
 import React from 'react';
-import VolumeIcon from '../../../assets/icons/volume-up-fill.svg';
 import { useSettings } from '../../../context/SettingsContext';
+import { VolumeIcon } from './DropdownIcons';
 
 const VolumeSlider = () => {
     const { volume, handleVolumeChange } = useSettings();
@@ -8,7 +8,7 @@ const VolumeSlider = () => {
 	return (
 		<>
 			<span style={{ marginBottom: '10px' }}>
-				<img src={VolumeIcon} alt='volume' />
+				<VolumeIcon />
 				<h3>Sound Settings</h3>
 			</span>
 			<div className='settings-option-container'>

@@ -16,6 +16,8 @@ const {
 	MESSAGE,
 	GET_ROOM_DATA,
   NEW_USER_JOINED,
+  SET_HOST,
+  SET_NEW_HOST
 } = require('../Commands');
 const PORT = process.env.PORT || 5000;
 
@@ -26,7 +28,6 @@ io.on('connection', (socket) => {
   socket.on(USER_JOINED, ({ username, roomId }) => {
     
     const { user } = addUser({ id: socket.id, username, roomId });
-
     socket.join(user.roomId);
     
     io.in(user.roomId).emit(MESSAGE, {
@@ -38,11 +39,30 @@ io.on('connection', (socket) => {
 
     const users = getAllUsersInRoom(user.roomId);
 
+    if (users.length === 1 || !socket.host) {
+      socket.host = users[0].id
+    };
 
+    io.in(user.roomId).emit(SET_HOST, socket.host);
     io.in(user.roomId).emit(GET_ROOM_DATA, { roomId: user.roomId, users });
   });
 
-  
+  socket.on(SET_NEW_HOST, (newHost) => {
+
+    const user = getUser(newHost);
+    const users = getAllUsersInRoom(user.roomId);
+
+    if (socket.id === socket.host) {
+      socket.host = newHost;
+      io.in(user.roomId).emit(SET_HOST, socket.host);
+      io.in(user.roomId).emit(MESSAGE, {
+        type: 'NEW_HOST',
+        content: user.username + " is now the host."
+      });
+    };
+    console.log('users', users);
+  });
+
   socket.on(PLAY, () => {
     const user = getUser(socket.id);
     socket.to(user.roomId).emit(PLAY);
@@ -80,6 +100,15 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
       const user = removeUser(socket.id);
+
+      console.log('user on disconnect', user);
+
+      const users = getAllUsersInRoom(user.roomId);
+
+      if (users[0]) {
+        socket.host = users[0].id;
+        io.in(user.roomId).emit(SET_HOST, socket.host);
+      };
       
       if (user) {
         const users = getAllUsersInRoom(user.roomId);
@@ -90,7 +119,7 @@ io.on('connection', (socket) => {
         });
 
         io.in(user.roomId).emit(GET_ROOM_DATA, { roomId: user.roomId, users });
-      }
+      };
     });
   });
 

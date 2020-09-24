@@ -127,7 +127,7 @@ input {
 			align-items: center;
 			margin-bottom: 5px;
 
-			img {
+			svg {
 				margin-right: 5px;
 				width: 22px;
 			}
@@ -370,6 +370,10 @@ input {
 		box-sizing: border-box;
 		border-radius: 10px;
 
+		&.show-only-name-input {
+			height: 220px;
+		}
+
 		form {
 			justify-content: center;
 			display: flex;
@@ -577,28 +581,34 @@ input {
 	}
 }
 
-.SERVER_MESSAGE:not(:first-of-type) {
-	margin: 10px 0;
+%SERVER_MESSAGE {
+	display: block;
+	font-weight: 600;
+	border-radius: 5px;
+	box-sizing: border-box;
+	font-size: 1em;
+
+	&:not(:first-of-type) {
+		margin: 10px 0;
+	}
 }
 
 .SERVER_USER-JOINED {
-	display: block;
+	@extend %SERVER_MESSAGE;
 	color: #17b978;
 	background-color: #41e0a152;
-	font-weight: 600;
-	border-radius: 5px;
-	box-sizing: border-box;
-	font-size: 1em;
 }
 
 .SERVER_USER-LEFT {
-	display: block;
+	@extend %SERVER_MESSAGE;
 	color: #9c453b;
 	background-color: #f3b0a7;
-	font-weight: 600;
-	border-radius: 5px;
-	box-sizing: border-box;
-	font-size: 1em;
+}
+
+.NEW_HOST {
+	@extend %SERVER_MESSAGE;
+	color: #ffffff;
+	background-color: #ff8a5c;
 }
 
 .users-list-container {
@@ -624,7 +634,6 @@ input {
 		overflow-x: hidden;
 		max-height: 150px;
 		margin-top: 10px;
-		background-color: #eeeeee;
 		width: 100%;
 
 		&::-webkit-scrollbar {
@@ -642,20 +651,30 @@ input {
 	li {
 		display: flex;
 		align-items: center;
-		padding: 5px;
+		padding: 5px 0;
 
 		&:not(:last-of-type) {
 			margin-bottom: 5px;
 		}
-	}
 
-	span {
-		font-size: 0.8em;
-		margin-right: 5px;
-		background-color: #22eaaa;
-		border-radius: 50%;
-		width: 12px;
-		height: 12px;
+		&[data-isadmin=true] {
+			color:#f5587b;
+			font-weight: 700;
+		}
+
+		h4 {
+			margin-right: 4px;
+			font-weight: 700;
+		}
+
+		svg {
+			margin-right: 3px;
+			width: 20px;
+		}
+
+		.add-user-button {
+			
+		}
 	}
 }
 

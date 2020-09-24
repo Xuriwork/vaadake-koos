@@ -15,7 +15,9 @@ import {
 	SEND_MESSAGE,
 	MESSAGE,
 	GET_ROOM_DATA,
-	NEW_USER_JOINED
+	NEW_USER_JOINED,
+	SET_HOST,
+	SET_NEW_HOST
 } from '../Commands';
 
 import { SettingsContext } from '../context/SettingsContext';
@@ -46,6 +48,7 @@ export class VideoRoom extends Component {
 		player: null,
 		users: [],
 		messages: [],
+		host: null,
 		loading: true,
 	};
 
@@ -108,6 +111,8 @@ export class VideoRoom extends Component {
 		socket.on(GET_ROOM_DATA, ({ roomId, users }) => {
 			this.setState({ roomId, users });
 		});
+
+		socket.on(SET_HOST, (host) => this.setState({ host }));
 	};
 
 	onReady = (e) => {
@@ -172,6 +177,10 @@ export class VideoRoom extends Component {
 		audio.play();
 	};
 
+	handleSetNewHost = (userId) => {
+		this.state.socket.emit(SET_NEW_HOST, userId);
+	};
+
 	onStateChanged = () => {
 		const { player, socket } = this.state;
 
@@ -197,12 +206,11 @@ export class VideoRoom extends Component {
 			break;
 		}
 	};
-
 	
 	render() {	
 		if (this.state.loading) return <Loading />;
 		
-		const { messages, users, socket } = this.state;
+		const { messages, users, socket, host } = this.state;
 		
 		return (
 			<div className='room-page'>
@@ -236,6 +244,8 @@ export class VideoRoom extends Component {
 							users={users}
 							socket={socket}
 							sendMessage={this.sendMessage}
+							host={host}
+							handleSetNewHost={this.handleSetNewHost}
 						/>
 					)}
 				</div>

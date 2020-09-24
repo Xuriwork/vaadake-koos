@@ -4,7 +4,7 @@ const DropdownItem = ({ Icon, name, options }) => {
     return (
 			<>
 				<span>
-					<img src={Icon} alt={name} />
+					<Icon />
 					<h3>{name}</h3>
 				</span>
 				<div className='settings-option-container'>

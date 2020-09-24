@@ -27,10 +27,19 @@ const Header = ({ roomId }) => {
 		roomIdInputRef.current.select();
 		document.execCommand('copy');
 		e.target.focus();
-		notyf.success('Copied to clipboard 📋')
+		notyf.success('Copied to clipboard 📋');
+	};
+	
+	const updateClipboard = (textToCopy) => {
+		navigator.clipboard.writeText(textToCopy).then(() => {
+			notyf.success('Copied invite link 📋');
+		}, () => notyf.success('Failed to copy invite link 🙁'));
 	};
 
-	const handleCreateInviteCode = () => notyf.error('This is disabled for now');
+	const handleCreateInviteCode = () => {
+		const inviteLink = `${window.location.href}join?roomId=${roomId}`;
+		updateClipboard(inviteLink);
+	};
 
 	return (
 		<header className='header'>
