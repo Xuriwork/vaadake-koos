@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react';
+import useSound from 'use-sound';
+import { useLocalStorage } from '../hooks/useLocalStorage';
+import UserJoinedSoundEffect from '../assets/audio/user-joined-sound.mp3';
 
 const SettingsContext = React.createContext();
 
 const SettingsProvider = ({ children }) => {
 
-    const [chatHidden, setChatHidden] = useState(() => {
-        return localStorage.getItem('chatHidden') || false;
-    });
-
-    const [theme, setTheme] = useState(() => {
-        return localStorage.getItem('theme') || 'light';
-    });
+    const [volume, setVolume] = useLocalStorage(0.5, 'volume');
+    const [chatHidden, setChatHidden] = useLocalStorage(false, 'chatHidden');
+    const [theme, setTheme] = useLocalStorage('light', 'theme');
+    
+    const handleVolumeChange = (e) => setVolume(e.target.value);
+    
+    const [playUserJoinedSound] = useSound(UserJoinedSoundEffect, { volume });
 
     return (
         <SettingsContext.Provider 
@@ -18,7 +21,10 @@ const SettingsProvider = ({ children }) => {
             theme, 
             chatHidden, 
             setTheme, 
-            setChatHidden, 
+            setChatHidden,
+            volume,
+            handleVolumeChange,
+            playUserJoinedSound
         }}>
             {children}
         </SettingsContext.Provider>

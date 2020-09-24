@@ -4,8 +4,6 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import './App.scss';
 import 'notyf/notyf.min.css';
 
-import SettingsProvider from './context/SettingsContext';
-
 import Header from './components/Header/Header';
 import JoinPage from './pages/JoinPage';
 import RoomPage from './pages/VideoRoomPage';
@@ -15,22 +13,22 @@ const App = () => {
 	const [info, setInfo] = useState({});
 
 	const handleSetCredentials = (username, roomId) => {
+		username = username.trim();
+		roomId = roomId.trim();
         setInfo({username, roomId });
 	};
-
+	
 	return (
-		<SettingsProvider>
-			<BrowserRouter>
-				<Header roomId={info.roomId} />
-				<div className='app-component'>
-					<Switch>
-						<Route exact path='/' component={() => <RoomPage username={info.username} roomId={info.roomId} setInfo={setInfo} />} />
-						<Route path='/join' component={() => <JoinPage handleSetCredentials={handleSetCredentials} />} />
-						<Route component={NotFoundPage} />
-					</Switch>
-				</div>
-			</BrowserRouter>
-		</SettingsProvider>
+		<BrowserRouter>
+			<Header roomId={info.roomId} />
+			<div className='app-component'>
+				<Switch>
+					<Route exact path='/' component={() => <RoomPage username={info.username} roomId={info.roomId} setInfo={setInfo} />} />
+					<Route path='/join' component={() => <JoinPage handleSetCredentials={handleSetCredentials} />} />
+					<Route component={NotFoundPage} />
+				</Switch>
+			</div>
+		</BrowserRouter>
 	);
 };
 

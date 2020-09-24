@@ -6,21 +6,23 @@ import YouTube from 'react-youtube';
 
 import {
 	PLAY,
+	USER_JOINED,
 	PAUSE,
 	SYNC_TIME,
 	NEW_VIDEO,
 	GET_VIDEO_INFORMATION,
 	SYNC_VIDEO_INFORMATION,
-	JOIN_ROOM,
-	RECEIVED_MESSAGE,
-	GET_USERNAME,
-	SEND_USERNAME,
 	SEND_MESSAGE,
+	MESSAGE,
+	GET_ROOM_DATA,
+	NEW_USER_JOINED
 } from '../Commands';
 
 import { SettingsContext } from '../context/SettingsContext';
 import Loading from '../components/Loading';
 import Chat from '../components/Chat';
+
+import UserJoinedSoundEffect from '../assets/audio/user-joined-sound.mp3';
 
 const socketURL = process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : process.env.REACT_APP_GAE_API_URL;
 const URL_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)/;
@@ -42,17 +44,14 @@ export class VideoRoom extends Component {
 	state = {
 		socket: null,
 		player: null,
-		videoURL: 'https://www.youtube.com/watch?v=_hql7mO-zaA',
-		messages: [],
 		users: [],
+		messages: [],
 		loading: true,
 	};
 
 	componentDidMount() {
-		const { roomId, username } = this.props;
-		if (!(roomId && username)) {
-			return this.props.history.push('/join');
-		};
+		const { roomId, username, history } = this.props;
+		if (!(roomId && username)) return history.push('/join');
 		this.setState({ loading: false });
 	};
 
@@ -68,11 +67,13 @@ export class VideoRoom extends Component {
 		const { player } = this.state;
 		
 		socket.on('connect', () => {
-			socket.emit(JOIN_ROOM, { roomId, username });
+			socket.emit(USER_JOINED, { roomId, username });
 			socket.emit(GET_VIDEO_INFORMATION);
 		});
 
-		//socket.on('disconnect', () => socket.open());
+		//socket.on('DISCONNECT', () => socket.open());
+
+		socket.on(NEW_USER_JOINED, () => this.context.playUserJoinedSound());
 
 		socket.on(PLAY, () => player.playVideo());
 
@@ -84,7 +85,6 @@ export class VideoRoom extends Component {
 			player.loadVideoById({
 				videoId: this.convertURLToYoutubeVideoId(videoURL)
 			});
-			this.setState({ videoURL: '' });
 		});
 
 		socket.on(GET_VIDEO_INFORMATION, () => {
@@ -103,23 +103,15 @@ export class VideoRoom extends Component {
 			});
 		});
 
-		socket.on(RECEIVED_MESSAGE, (data) => this.getMessages(data));
+		socket.on(MESSAGE, (data) => this.getMessages(data));
 
-		socket.on(GET_USERNAME, () => {
-			this.setState({ users: [] });
-			this.state.socket.emit(SEND_USERNAME, this.props.username);
-		});
-
-		socket.on(SEND_USERNAME, (username) => {
-			this.setState({
-				users: [...this.state.users, username],
-			});
+		socket.on(GET_ROOM_DATA, ({ roomId, users }) => {
+			this.setState({ roomId, users });
 		});
 	};
 
 	onReady = (e) => {
 		this.setState({ player: e.target });
-
 		const socket = io(socketURL);
 		this.setState({ socket });
 		this.onSocketMethods(socket);
@@ -175,6 +167,11 @@ export class VideoRoom extends Component {
 		});
 	};
 
+	playUserJoinedSound = () => {
+		const audio = new Audio(UserJoinedSoundEffect);
+		audio.play();
+	};
+
 	onStateChanged = () => {
 		const { player, socket } = this.state;
 
@@ -200,8 +197,9 @@ export class VideoRoom extends Component {
 			break;
 		}
 	};
+
 	
-	render() {
+	render() {	
 		if (this.state.loading) return <Loading />;
 		
 		const { messages, users, socket } = this.state;

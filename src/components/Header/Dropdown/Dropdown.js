@@ -1,9 +1,15 @@
 import React, { useEffect, useRef } from 'react';
 import { Notyf } from 'notyf';
-import { useSettings } from '../../context/SettingsContext';
+import useSound from 'use-sound';
+
+import { useSettings } from '../../../context/SettingsContext';
 import toggleButton from './toggleButton';
-import LayoutIcon from '../../assets/layout-5-fill.svg';
-import PaletteIcon from '../../assets/palette-fill.svg';
+import DropdownItem from './DropdownItem';
+import VolumeSlider from './VolumeSlider';
+
+import ToggleSoundEffect from '../../../assets/audio/switch-sound.mp3';
+import LayoutIcon from '../../../assets/icons/layout-5-fill.svg';
+import PaletteIcon from '../../../assets/icons/palette-fill.svg';
 
 const notyf = new Notyf({
 	duration: 2500,
@@ -14,12 +20,11 @@ const notyf = new Notyf({
 });
 
 const Dropdown = ({ dropdownOpen, closeDropdown, dropdownButtonRef }) => {
-    const { theme, chatHidden, setTheme, setChatHidden } = useSettings();
+	const { theme, chatHidden, setTheme, setChatHidden, volume } = useSettings();
+	const [play] = useSound(ToggleSoundEffect, { volume });
     const toggleChatButtonRef = useRef(null);
 	const toggleDarkModeButtonRef = useRef(null);
 	const dropdownRef = useRef(null);
-
-	const dropdownClass = dropdownOpen ? 'dropdown' : 'dropdown hidden';
 
     useEffect(() => {
 		const button = toggleDarkModeButtonRef.current;
@@ -66,37 +71,47 @@ const Dropdown = ({ dropdownOpen, closeDropdown, dropdownButtonRef }) => {
 	const toggleDarkMode = () => {
 		toggleButton(toggleDarkModeButtonRef, 'toggleDarkModeButton', setTheme);
 		notyf.error('Not implemented yet, but I\'m like this 🤏 close.');
+		play();
 	};
 
-	const toggleShowChat = () => toggleButton(toggleChatButtonRef, 'toggleChatButton', setChatHidden);
+	const toggleShowChat = () => {
+		toggleButton(toggleChatButtonRef, 'toggleChatButton', setChatHidden);
+		play();
+	};
+
+	const LayoutSettings = [
+		{
+			name: 'Chat',
+			onClick: toggleShowChat,
+			ref: toggleChatButtonRef,
+			buttonOptions: ['Show', 'Hide'],
+		}
+	];
+
+	const InterfaceSettings = [
+		{
+			name: 'Toggle Dark Mode',
+			onClick: toggleDarkMode,
+			ref: toggleDarkModeButtonRef,
+			buttonOptions: ['On', 'Off'],
+		}
+	];
 
 	return (
-		<>
-		<div ref={dropdownRef} className={dropdownClass}>
-			<span>
-				<img src={LayoutIcon} alt='layout' />
-				<h3>Layout Settings</h3>
-			</span>
-			<div className='settings-option-container'>
-				<p>Chat</p>
-				<button onClick={toggleShowChat} ref={toggleChatButtonRef}>
-					<span>Show</span>
-					<span>Hide</span>
-				</button>
-			</div>
-			<span>
-				<img src={PaletteIcon} alt='palette' />
-				<h3>Interface Settings</h3>
-			</span>
-			<div className='settings-option-container'>
-				<p>Toggle Dark Mode</p>
-				<button onClick={toggleDarkMode} ref={toggleDarkModeButtonRef}>
-					<span>On</span>
-					<span>Off</span>
-				</button>
-			</div>
+		<div ref={dropdownRef} className='dropdown'>
+			<DropdownItem
+				Icon={LayoutIcon}
+				name='Layout Settings'
+				options={LayoutSettings}
+			/>
+			<DropdownItem
+				Icon={PaletteIcon}
+				name='Interface Settings'
+				options={InterfaceSettings}
+			/>
+			<VolumeSlider />
+
 		</div>
-		</>
 	);
 };
 

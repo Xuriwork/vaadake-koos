@@ -5,7 +5,7 @@ import shortid from 'shortid';
 const JoinPage = ({ handleSetCredentials }) => {
     const history = useHistory();
     const [username, setUsername] = useState('');
-	const [roomId, setRoomId] = useState('');
+    const [roomId, setRoomId] = useState('');
 
     const handleOnChangeRoomId = (e) => setRoomId(e.target.value);
     const handleOnChangeUsername = (e) => setUsername(e.target.value);

@@ -2,10 +2,11 @@ import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Notyf } from 'notyf';
 
-import Logo from '../../assets/vaadake_koos_logo.svg';
-import LinksIcon from '../../assets/links-line.svg';
-import Dropdown from './Dropdown';
- 
+import Logo from '../../assets/images/vaadake_koos_logo.svg';
+import LinksIcon from '../../assets/icons/links-line.svg';
+
+import Dropdown from './Dropdown/Dropdown';
+
 const notyf = new Notyf({
 	duration: 2500,
 	position: {
@@ -50,7 +51,11 @@ const Header = ({ roomId }) => {
 					</button>
 				</div>
 			)}
-			<button ref={dropdownButtonRef} onClick={toggleDropdown} className='settings-button'>
+			<button
+				ref={dropdownButtonRef}
+				onClick={toggleDropdown}
+				className='settings-button'
+			>
 				<svg
 					xmlns='http://www.w3.org/2000/svg'
 					viewBox='0 0 24 24'
@@ -64,10 +69,13 @@ const Header = ({ roomId }) => {
 					/>
 				</svg>
 			</button>
-			{
-
-			dropdownOpen && <Dropdown dropdownOpen={dropdownOpen} closeDropdown={closeDropdown} dropdownButtonRef={dropdownButtonRef} />
-			}
+			{dropdownOpen && (
+				<Dropdown
+					dropdownOpen={dropdownOpen}
+					closeDropdown={closeDropdown}
+					dropdownButtonRef={dropdownButtonRef}
+				/>
+			)}
 		</header>
 	);
 };

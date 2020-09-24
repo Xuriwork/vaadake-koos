@@ -133,9 +133,42 @@ input {
 			}
 		}
 
-		&.hidden {
-			opacity: 0;
-			pointer-events: none;
+		.volume-range-slider {
+			-webkit-appearance: none;
+		}
+
+		.volume-range-slider:focus {
+			outline: none;
+		}
+
+		.volume-range-slider::-webkit-slider-runnable-track {
+			background: #e9d3e1;
+			height: 5px;
+			border-radius: 5px;
+		}
+
+		.volume-range-slider::-moz-range-track {
+			background: #c78db2;
+			height: 5px;
+			border-radius: 5px;
+		}
+
+		.volume-range-slider::-webkit-slider-thumb {
+			-webkit-appearance: none;
+			height: 12px;
+			width: 12px;
+			background: #f02eaa;
+			margin-top: -4px;
+			border-radius: 50%;
+			cursor: pointer;
+		}
+
+		.volume-range-slider::-moz-range-thumb {
+			height: 15px;
+			width: 15px;
+			background: #f02eaa;
+			margin-top: -5px;
+			border-radius: 50%;
 		}
 	}
 
