@@ -7,19 +7,24 @@ const Chat = ({ messages, sendMessage, users, socket, host, handleSetNewHost }) 
 	const [newMessagePopup, setNewMessagePopup] = useState(false);
 	const chatContainerRef = useRef(null);
 	
-	const scrollToBottom = () => {
+	const scrollToBottom = (force = false) => {
 		const chatContainer = chatContainerRef.current;
 		const { scrollHeight, scrollTop, offsetHeight } = chatContainer;
 		chatContainer.maxScrollTop = scrollHeight - offsetHeight;
 
-		if (chatContainer.maxScrollTop - scrollTop <= offsetHeight) {
+		if (chatContainer.maxScrollTop - scrollTop <= offsetHeight || force) {
 			chatContainer.scroll(0, scrollHeight);
 		} else setNewMessagePopup(true);
 	};
 
-	useEffect(() => scrollToBottom(), [messages]);
+	useEffect(() => {
+		scrollToBottom();
+	}, [messages]);
 
-	const handleRemoveNewMessagesAlert = () => setNewMessagePopup(false);
+	const handleSeeNewMessages = () => {
+		scrollToBottom(true);
+		setNewMessagePopup(false);
+	};
 
 	const handleOnChangeMessage = (e) => setMessage(e.target.value);
 	const handleOnKeyDown = (e) => {
@@ -80,7 +85,7 @@ const Chat = ({ messages, sendMessage, users, socket, host, handleSetNewHost }) 
 			{newMessagePopup && (
 				<span
 					className='new-messages-alert'
-					onClick={handleRemoveNewMessagesAlert}
+					onClick={handleSeeNewMessages}
 				>
 					New messages <img src={DownArrowIcon} alt='Scroll down' />{' '}
 				</span>
