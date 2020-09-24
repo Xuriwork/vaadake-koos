@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import useSound from 'use-sound';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import UserJoinedSoundEffect from '../assets/audio/user-joined-sound.mp3';
+import ToggleSoundEffect from '../assets/audio/slider-sound.mp3';
 
 const SettingsContext = React.createContext();
 
@@ -10,7 +11,9 @@ const SettingsProvider = ({ children }) => {
     const [volume, setVolume] = useLocalStorage(0.5, 'volume');
     const [chatHidden, setChatHidden] = useLocalStorage(false, 'chatHidden');
     const [theme, setTheme] = useLocalStorage('light', 'theme');
+
     const [playUserJoinedSound] = useSound(UserJoinedSoundEffect, { volume });
+    const [playSliderSound] = useSound(ToggleSoundEffect, { volume });
 
     useEffect(() => {
         if (theme === 'light' && document.body.classList.contains('dark')) {
@@ -22,7 +25,10 @@ const SettingsProvider = ({ children }) => {
         };
     }, [theme]);
     
-    const handleVolumeChange = (e) => setVolume(e.target.value);
+    const handleVolumeChange = (e) => {
+        setVolume(e.target.value);
+        playSliderSound();
+    };
     
     return (
         <SettingsContext.Provider 
