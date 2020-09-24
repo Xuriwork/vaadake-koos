@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-import { Notyf } from 'notyf';
 import useSound from 'use-sound';
 
 import { useSettings } from '../../../context/SettingsContext';
@@ -10,17 +9,9 @@ import VolumeSlider from './VolumeSlider';
 import { LayoutIcon, PaletteIcon } from './DropdownIcons';
 import ToggleSoundEffect from '../../../assets/audio/switch-sound.mp3';
 
-const notyf = new Notyf({
-	duration: 2500,
-	position: {
-		x: 'right',
-		y: 'bottom',
-	},
-});
-
 const Dropdown = ({ dropdownOpen, closeDropdown, dropdownButtonRef }) => {
 	const { theme, chatHidden, setTheme, setChatHidden, volume } = useSettings();
-	const [play] = useSound(ToggleSoundEffect, { volume });
+	const [playToggleSound] = useSound(ToggleSoundEffect, { volume });
     const toggleChatButtonRef = useRef(null);
 	const toggleDarkModeButtonRef = useRef(null);
 	const dropdownRef = useRef(null);
@@ -69,13 +60,12 @@ const Dropdown = ({ dropdownOpen, closeDropdown, dropdownButtonRef }) => {
 
 	const toggleDarkMode = () => {
 		toggleButton(toggleDarkModeButtonRef, 'toggleDarkModeButton', setTheme);
-		notyf.error('Not implemented yet, but I\'m like this 🤏 close.');
-		play();
+		playToggleSound();
 	};
 
 	const toggleShowChat = () => {
 		toggleButton(toggleChatButtonRef, 'toggleChatButton', setChatHidden);
-		play();
+		playToggleSound();
 	};
 
 	const LayoutSettings = [

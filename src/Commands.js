@@ -1,5 +1,5 @@
 module.exports = {
-  USER_JOINED: 'USER_JOINED',
+  JOIN: 'JOIN',
   PLAY: 'PLAY',
   PAUSE: 'PAUSE',
   SYNC_TIME: 'SYNC_TIME',

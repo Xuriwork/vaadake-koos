@@ -19,4 +19,11 @@ const removeUser = (id) => {
 const getUser = (id) => users.find((user) => user.id === id);
 const getAllUsersInRoom = (roomId) => users.filter((user) => user.roomId === roomId);
 
-module.exports = { addUser, removeUser, getUser, getAllUsersInRoom };
+const leaveAllRooms = (socket) => {
+	const rooms = socket.adapter.sids[socket.id];
+	Object.keys(rooms).forEach((room) => {
+		if (room !== socket.id) socket.leave(room);
+	});
+};
+
+module.exports = { addUser, removeUser, getUser, getAllUsersInRoom, leaveAllRooms };

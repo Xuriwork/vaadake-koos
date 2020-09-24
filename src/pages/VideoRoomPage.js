@@ -6,7 +6,7 @@ import YouTube from 'react-youtube';
 
 import {
 	PLAY,
-	USER_JOINED,
+	JOIN,
 	PAUSE,
 	SYNC_TIME,
 	NEW_VIDEO,
@@ -22,7 +22,7 @@ import {
 
 import { SettingsContext } from '../context/SettingsContext';
 import Loading from '../components/Loading';
-import Chat from '../components/Chat';
+import Chat from '../components/Chat/Chat';
 
 import UserJoinedSoundEffect from '../assets/audio/user-joined-sound.mp3';
 
@@ -70,7 +70,7 @@ export class VideoRoom extends Component {
 		const { player } = this.state;
 		
 		socket.on('connect', () => {
-			socket.emit(USER_JOINED, { roomId, username });
+			socket.emit(JOIN, { roomId, username });
 			socket.emit(GET_VIDEO_INFORMATION);
 		});
 
@@ -122,7 +122,7 @@ export class VideoRoom extends Component {
 		this.onSocketMethods(socket);
 	};
 
-	onError = (error) => console.log(error);
+	onError = (error) => console.error(error);
 
 	convertURLToYoutubeVideoId = (url) => {
 		let id = '';
@@ -147,7 +147,6 @@ export class VideoRoom extends Component {
 
 	handleChangeVideo = (e) => {
 		e.preventDefault();
-		console.log(this.urlInput.value);
 		if (!URL_REGEX.test(this.urlInput.value)) return;
 		this.state.socket.emit(NEW_VIDEO, this.urlInput.value);
 	};
@@ -211,11 +210,11 @@ export class VideoRoom extends Component {
 		if (this.state.loading) return <Loading />;
 		
 		const { messages, users, socket, host } = this.state;
-		
+
 		return (
 			<div className='room-page'>
 				<div className='video-and-chat-container'>
-					<div className='video-and-input-container'>
+					<div className='video-and-input-container' data-chatishidden={this.context.chatHidden}>
 						<div className='embed-responsive embed-responsive-16by9'>
 							<YouTube
 								videoId='_hql7mO-zaA'
@@ -229,11 +228,9 @@ export class VideoRoom extends Component {
 						<div className='change-video-container'>
 							<input
 								type='text'
-								placeholder='Enter URL'
+								placeholder='Enter YouTube Video URL'
 								pattern='https://.*'
-								ref={(input) => {
-									this.urlInput = input;
-								}}
+								ref={(input) => this.urlInput = input}
 							/>
 							<button onClick={this.handleChangeVideo}>Change Video</button>
 						</div>
