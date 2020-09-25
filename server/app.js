@@ -94,7 +94,11 @@ io.on('connection', (socket) => {
 
   socket.on(SEND_MESSAGE, (data) => {
     const user = getUser(socket.id);
-    io.in(user.roomId).emit(MESSAGE, { username: user.username, content: data.content });
+    io.in(user.roomId).emit(MESSAGE, { 
+      username: user.username, 
+      content: data.content, 
+      id: socket.id 
+    });
   });
 
   socket.on('disconnect', () => {

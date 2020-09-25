@@ -160,7 +160,7 @@ input {
 }
 
 .header {
-	background-color: var(--chat-background);
+	background-color: var(--header-background);
 	height: 70px;
 	display: flex;
 	align-items: center;
@@ -661,6 +661,10 @@ input {
 			margin-right: 3px;
 			width: 20px;
 		}
+
+		.add-user-button {
+			background-color: transparent;	
+		}
 	}
 }
 
@@ -779,8 +783,8 @@ input {
 
 .SERVER_USER-LEFT {
 	@extend %SERVER_MESSAGE;
-	color: #9c453b;
-	background-color: #f3b0a7;
+	color: #833c34;
+	background-color: #f58c7e;
 }
 
 .NEW_HOST {
