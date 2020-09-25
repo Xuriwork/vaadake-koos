@@ -158,7 +158,8 @@ export class VideoRoom extends Component {
 				{
 					username: data.username,
 					content: data.content,
-					type: data.type
+					type: data.type,
+					id: data.id,
 				},
 			],
 		});

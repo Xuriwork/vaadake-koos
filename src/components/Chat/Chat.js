@@ -60,7 +60,7 @@ const Chat = ({ messages, sendMessage, users, socket, host, handleSetNewHost }) 
 				</ul>
 			</div>
 			<div className='messages-container' ref={chatContainerRef}>
-				{messages.map(({ type, content, username }, index) => (
+				{messages.map(({ type, content, username, id }, index) => (
 					<div
 						className={
 							type === 'SERVER_USER-JOINED'
@@ -76,7 +76,7 @@ const Chat = ({ messages, sendMessage, users, socket, host, handleSetNewHost }) 
 						{type === 'SERVER_USER-JOINED' ||
 						type === 'SERVER_USER-LEFT' || 
 						type === 'NEW_HOST' ? null : (
-							<h4 className='message-author'>{username}</h4>
+							<h4 className='message-author' data-you={id === socket.id}>{username}</h4>
 						)}
 						<p className='message-content'>{content}</p>
 					</div>

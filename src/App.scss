@@ -641,6 +641,7 @@ input {
 		display: flex;
 		align-items: center;
 		padding: 5px 0;
+		color: var(--text);
 
 		&:not(:last-of-type) {
 			margin-bottom: 5px;
@@ -659,10 +660,6 @@ input {
 		svg {
 			margin-right: 3px;
 			width: 20px;
-		}
-
-		.add-user-button {
-			
 		}
 	}
 }
@@ -753,6 +750,11 @@ input {
 
 	.message-author {
 		margin-right: 5px;
+		color: #17b978;
+
+		&[data-you=true] {
+			color: #ff5959;
+		}
 	}
 }
 
