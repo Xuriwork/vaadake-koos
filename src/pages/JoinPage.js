@@ -31,6 +31,8 @@ const JoinPage = ({ handleSetCredentials }) => {
 
     const handleGenerateRandomRoomId = (e) => setRoomId(createRandomRoomId(e));
 
+    const preventDefault = (e) => e.keyCode === 13 && e.preventDefault();
+
 	const createRandomRoomId = (e) => {
         e.preventDefault();
         const randomId = shortid.generate() + shortid.generate();
@@ -70,7 +72,13 @@ const JoinPage = ({ handleSetCredentials }) => {
                         </>
                     )}
                     <label>Name</label>
-                    <input type='text' name='name' value={username} onChange={handleOnChangeUsername} />
+                    <input 
+                        type='text' 
+                        name='name' 
+                        value={username} 
+                        onChange={handleOnChangeUsername} 
+                        onKeyDown={preventDefault}   
+                    />
                     <button className='join-button' onClick={joinRoom}>Join</button>
                 </form>
             </div>

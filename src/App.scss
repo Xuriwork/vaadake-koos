@@ -63,7 +63,7 @@
 	--theme-color: var(--theme-color-lm);
 	--theme-color-secondary: var(--theme-color-secondary-lm);
 	--theme-color-opacity: var(--theme-color-opacity-lm);
-	--bg: var(--background-lm);
+	--background: var(--background-lm);
 	--background-fallback: var(--background-fallback-lm);
 	--input-bg: var(--input-bg-lm);
 	--container-bg: var(--container-bg-lm);
@@ -80,7 +80,7 @@
 	--theme-color: var(--theme-color-dm);
 	--theme-color-secondary: var(--theme-color-secondary-dm);
 	--theme-color-opacity: var(--theme-color-opacity-dm);
-	--bg: var(--background-dm);
+	--background: var(--background-dm);
 	--background-fallback: var(--background-fallback-dm);
 	--input-bg: var(--input-bg-dm);
 	--container-bg: var(--container-bg-dm);
@@ -141,7 +141,7 @@ body {
 	-moz-background-size: cover;
 	-o-background-size: cover;
 	background-size: cover;
-	background-image: var(--bg);
+	background-image: var(--background);
 	background-color: var(--background-fallback);
 }
 
@@ -360,10 +360,16 @@ input {
 .loading-screen {
 	@extend %flex-complete-center-column;
 	height: 100%;
+	width: 100%;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 3;
+	background-color: var(--container-bg);
+	color: var(--text);
 
 	h1 {
 		margin-bottom: 35px;
-		color: #ffffff;
 		font-size: 1.3em;
 		text-align: center;
 	}
@@ -380,7 +386,7 @@ input {
 		width: 0.8em;
 		height: 0.8em;
 		border-radius: 50%;
-		background-color: #ffffff;
+		background-color: var(--text);
 		transform: translateY(-100%);
 		animation: wave 0.8s ease-in-out alternate infinite;
 	}
@@ -506,7 +512,7 @@ input {
 
 			.generate-random-roomId-button {
 				padding: 8px;
-				background-color: #ffffff;
+				background-color:transparent;
 				color: #ec3160;
 				font-size: 0.95em;
 				margin-bottom: 15px;

@@ -55,7 +55,6 @@ export class VideoRoom extends Component {
 	componentDidMount() {
 		const { roomId, username, history } = this.props;
 		if (!(roomId && username)) return history.push('/join');
-		this.setState({ loading: false });
 	};
 
 	componentWillUnmount() {
@@ -120,6 +119,7 @@ export class VideoRoom extends Component {
 		const socket = io(socketURL);
 		this.setState({ socket });
 		this.onSocketMethods(socket);
+		this.setState({ loading: false });
 	};
 
 	onError = (error) => console.error(error);
@@ -207,46 +207,48 @@ export class VideoRoom extends Component {
 	};
 	
 	render() {	
-		if (this.state.loading) return <Loading />;
 		
-		const { messages, users, socket, host } = this.state;
+		const { loading, messages, users, socket, host } = this.state;
 
 		return (
-			<div className='room-page'>
-				<div className='video-and-chat-container'>
-					<div className='video-and-input-container' data-chatishidden={this.context.chatHidden}>
-						<div className='embed-responsive embed-responsive-16by9'>
-							<YouTube
-								videoId='_hql7mO-zaA'
-								opts={youtubeConfig}
-								onStateChange={this.onStateChanged}
-								onReady={this.onReady}
-								onError={this.onError}
-								className='embed-responsive'
-							/>
+			<>
+				{ loading && <Loading /> }
+				<div className='room-page'>
+					<div className='video-and-chat-container'>
+						<div className='video-and-input-container' data-chatishidden={this.context.chatHidden}>
+							<div className='embed-responsive embed-responsive-16by9'>
+								<YouTube
+									videoId='_hql7mO-zaA'
+									opts={youtubeConfig}
+									onStateChange={this.onStateChanged}
+									onReady={this.onReady}
+									onError={this.onError}
+									className='embed-responsive'
+								/>
+							</div>
+							<div className='change-video-container'>
+								<input
+									type='text'
+									placeholder='Enter YouTube Video URL'
+									pattern='https://.*'
+									ref={(input) => this.urlInput = input}
+								/>
+								<button onClick={this.handleChangeVideo}>Change Video</button>
+							</div>
 						</div>
-						<div className='change-video-container'>
-							<input
-								type='text'
-								placeholder='Enter YouTube Video URL'
-								pattern='https://.*'
-								ref={(input) => this.urlInput = input}
+						{!this.context.chatHidden && (
+							<Chat
+								messages={messages}
+								users={users}
+								socket={socket}
+								sendMessage={this.sendMessage}
+								host={host}
+								handleSetNewHost={this.handleSetNewHost}
 							/>
-							<button onClick={this.handleChangeVideo}>Change Video</button>
-						</div>
+						)}
 					</div>
-					{!this.context.chatHidden && (
-						<Chat
-							messages={messages}
-							users={users}
-							socket={socket}
-							sendMessage={this.sendMessage}
-							host={host}
-							handleSetNewHost={this.handleSetNewHost}
-						/>
-					)}
 				</div>
-			</div>
+			</>
 		);
 	}
 }

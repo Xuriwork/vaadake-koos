@@ -38,15 +38,12 @@ const Chat = ({ messages, sendMessage, users, socket, host, handleSetNewHost }) 
         setMessage('');
 	};
 
-	const index = users.findIndex(user => user.id === host);
-
 	return (
 		<div className='chat-container'>
 			<div className='users-list-container'>
 				<h3>Connected Users: {users.length}</h3>
 				<ul>
-					{ <li>{users.filter((user) => user.id === host)[0].username}</li> }
-					{users.splice(index, 1).map((user) => {
+					{users.map((user) => {
 						return <li key={user.id} data-isadmin={user.id === host}>
 							{user.id === host && <SheildIcon />}
 							{host === socket.id && user.id !== host && (
