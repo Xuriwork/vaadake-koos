@@ -10,5 +10,5 @@ manual_scaling:
 
 network:
   session_affinity: true
-# [END socket.io-server_yaml]
 
+# [END socket.io-server_yaml]

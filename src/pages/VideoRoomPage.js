@@ -73,8 +73,6 @@ export class VideoRoom extends Component {
 			socket.emit(GET_VIDEO_INFORMATION);
 		});
 
-		//socket.on('DISCONNECT', () => socket.open());
-
 		socket.on(NEW_USER_JOINED, () => this.context.playUserJoinedSound());
 
 		socket.on(PLAY, () => player.playVideo());
@@ -178,6 +176,7 @@ export class VideoRoom extends Component {
 	};
 
 	handleSetNewHost = (userId) => {
+		console.log(userId);
 		this.state.socket.emit(SET_NEW_HOST, userId);
 	};
 

@@ -24,4 +24,4 @@ Project is created with:
 * Socket.io
 
 ## Dark Mode Screenshot of the app
-![Video Screen](./VaadakeKoos_VideoScreen.png)
+![Video Screen](./VaadakeKoos_VideoScreen_Preview.png)

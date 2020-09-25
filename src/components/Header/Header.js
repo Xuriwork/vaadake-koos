@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Notyf } from 'notyf';
 
 import Logo from '../../assets/images/vaadake_koos_logo.svg';
-import LinksIcon from '../../assets/icons/links-line.svg';
+import InviteUserIcon from '../../assets/icons/user-add-fill.svg';
 
 import Dropdown from './Dropdown/Dropdown';
 
@@ -32,7 +32,7 @@ const Header = ({ roomId }) => {
 	
 	const updateClipboard = (textToCopy) => {
 		navigator.clipboard.writeText(textToCopy).then(() => {
-			notyf.success('Copied invite link 📋');
+			notyf.success('Copied room link 📋');
 		}, () => notyf.success('Failed to copy invite link 🙁'));
 	};
 
@@ -56,7 +56,7 @@ const Header = ({ roomId }) => {
 						onClick={copyToClipboard}
 					/>
 					<button onClick={handleCreateInviteCode}>
-						<img src={LinksIcon} alt='Get invite link' />
+						<img src={InviteUserIcon} alt='Get invite link' />
 					</button>
 				</div>
 			)}

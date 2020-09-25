@@ -16,6 +16,7 @@ const VolumeSlider = () => {
 				<input
 					type='range'
 					name='volumeSlider'
+					id='volumeSlider'
 					className='volume-range-slider'
 					value={volume}
 					min='0'

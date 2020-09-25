@@ -6,39 +6,37 @@
 	--theme-color-secondary-dm: #0cebeb;
 
 	--theme-color-opacity-lm: #e075b9;
-	--theme-color-opacity-dm:  #77c9c9;
+	--theme-color-opacity-dm: #77c9c9;
 
 	--background-lm: linear-gradient(
 		180deg,
 		rgba(237, 135, 112, 1) 38%,
 		rgba(217, 81, 157, 1) 100%
 	);
-	--background-dm: linear-gradient(
-		45deg,
-		#363636,
-		#363636
-		);
+	--background-dm: linear-gradient(45deg, #363636, #363636);
 	--background-fallback-lm: #ed8770;
 	--background-fallback-dm: #0e153a;
 
 	--gradient-button-lm: linear-gradient(120deg, #fccb90 0%, #e088f7 100%);
-	--gradient-button-dm: linear-gradient(
-		to right,
-		#29ffc6,
-		#20e3b2,
-		#0cebeb
-	  );
+	--gradient-button-dm: linear-gradient(to right, #29ffc6, #20e3b2, #0cebeb);
 
-	--gradient-button-180deg-lm: linear-gradient(180deg, #fccb90 0%, #e088f7 120%);
-	--gradient-button-180deg-dm: linear-gradient(180deg,#34d3f7 0%, #5794e9 120%);
+	--gradient-button-180deg-lm: linear-gradient(
+		180deg,
+		#fccb90 0%,
+		#e088f7 120%
+	);
+	--gradient-button-180deg-dm: linear-gradient(
+		180deg,
+		#34d3f7 0%,
+		#5794e9 120%
+	);
 
 	--dropdown-box-shadow-lm: rgba(240, 46, 170, 0.4) 5px 5px,
-	rgba(240, 46, 170, 0.3) 10px 10px, rgba(240, 46, 170, 0.2) 15px 15px,
-	rgba(240, 46, 170, 0.1) 20px 20px, rgba(240, 46, 170, 0.05) 25px 25px;
+		rgba(240, 46, 170, 0.3) 10px 10px, rgba(240, 46, 170, 0.2) 15px 15px,
+		rgba(240, 46, 170, 0.1) 20px 20px, rgba(240, 46, 170, 0.05) 25px 25px;
 
-	--dropdown-box-shadow-dm: #45adad86 5px 5px,
-	#3ca5a57c 10px 10px,#3d929271 15px 15px,
-	#48a5a53a 20px 20px,#3e8d8d3d 25px 25px;
+	--dropdown-box-shadow-dm: #45adad86 5px 5px, #3ca5a57c 10px 10px,
+		#3d929271 15px 15px, #48a5a53a 20px 20px, #3e8d8d3d 25px 25px;
 
 	--volume-slider-lm: #e9d3e1;
 	--volume-slider-dm: #b7b6bd;
@@ -298,7 +296,8 @@ input {
 		cursor: pointer;
 		font-size: 0.9em;
 		background-color: var(--theme-color-opacity);
-		box-shadow: rgba(50, 50, 93, 0.05) 0px 30px 60px -5px inset, rgba(0, 0, 0, 0.1) 0px 18px 36px -8px inset;
+		box-shadow: rgba(50, 50, 93, 0.05) 0px 30px 60px -5px inset,
+			rgba(0, 0, 0, 0.1) 0px 18px 36px -8px inset;
 		color: #ffffff;
 		box-sizing: border-box;
 
@@ -512,7 +511,7 @@ input {
 
 			.generate-random-roomId-button {
 				padding: 8px;
-				background-color:transparent;
+				background-color: transparent;
 				color: #ec3160;
 				font-size: 0.95em;
 				margin-bottom: 15px;
@@ -557,8 +556,8 @@ input {
 	flex-direction: column;
 	justify-content: space-between;
 	overflow: hidden;
-	
-	&[data-chatishidden=true] {
+
+	&[data-chatishidden='true'] {
 		border-radius: 10px 10px 10px 10px;
 	}
 
@@ -621,7 +620,8 @@ input {
 	ul {
 		overflow-y: auto;
 		overflow-x: hidden;
-		max-height: 150px;
+		height: 100%;
+		max-height: calc(100% - 40px);
 		margin-top: 10px;
 		width: 100%;
 
@@ -632,7 +632,7 @@ input {
 		}
 
 		&::-webkit-scrollbar-thumb {
-			background-color: var(--theme-color-secondary);
+			background-color: var(--theme-color);
 			border-radius: 5px;
 		}
 	}
@@ -648,7 +648,7 @@ input {
 		}
 
 		&[data-isadmin=true] {
-			color:#f5587b;
+			color: #f5587b;
 			font-weight: 700;
 		}
 
@@ -663,7 +663,7 @@ input {
 		}
 
 		.add-user-button {
-			background-color: transparent;	
+			background-color: transparent;
 		}
 	}
 }
@@ -701,7 +701,7 @@ input {
 	}
 
 	&::-webkit-scrollbar-thumb {
-		background-color: var(--theme-color-secondary);
+		background-color: var(--theme-color);
 		border-radius: 5px;
 	}
 }
@@ -756,7 +756,7 @@ input {
 		margin-right: 5px;
 		color: #17b978;
 
-		&[data-you=true] {
+		&[data-you='true'] {
 			color: #ff5959;
 		}
 	}
@@ -790,7 +790,7 @@ input {
 .NEW_HOST {
 	@extend %SERVER_MESSAGE;
 	color: #ffffff;
-	background-color: #ff8a5c;
+	background-color: #ec570d;
 }
 
 @media (max-width: 1025px) {
