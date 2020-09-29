@@ -4,10 +4,14 @@ const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const bcrypt = require('bcrypt');
 
-const { addUser, removeUser, getUser, getAllUsersInRoom, leaveAllRooms } = require('./actions/userActions');
+const { addUser, removeUser, getUser, getAllUsersInRoom } = require('./actions/userActions');
 const { addRoom, removeRoom, getRoom } = require('./actions/roomActions');
 
 const {
+  CHECK_IF_ROOM_REQUIRES_PASSCODE,
+  REQUIRES_PASSCODE,
+  VERIFY_PASSCODE,
+  SET_ROOM_PASSCODE,
 	PLAY,
   JOIN,
 	PAUSE,
@@ -25,7 +29,7 @@ const {
   GET_PLAYLIST,
   ADD_TO_PLAYLIST,
   REMOVE_FROM_PLAYLIST,
-  GET_USERS
+  GET_USERS,
 } = require('../SocketActions');
 
 const PORT = process.env.PORT || 5000;
@@ -41,25 +45,28 @@ io.on('connection', (socket) => {
   const sendClientSuccessNotification = (message) => {
     socket.emit(NOTIFY_CLIENT_SUCCESS, message);
   };
-  
-  socket.on(JOIN, ({ username, roomId }) => {
-    
+
+  socket.on(CHECK_IF_ROOM_REQUIRES_PASSCODE, (roomId, callback) => {
     const room = getRoom(roomId);
-    console.log('room', room);
     
     if (room && room.passcode) {
-      return socket.emit('REDIRECT_TO_JOIN_PAGE_ROOM');
+      return callback(REQUIRES_PASSCODE, true);
     };
+    callback(null, false);
+  });
 
-    socket.on('PASSCODE', (passcode) => {
-      bcrypt.compare(passcode,  room.passcode)
-      .then((result) => {
-        console.log(result);
-        if (result === false) {
-          return sendClientErrorNotification('Wrong passcode');
-        };
-      });
-    })
+  socket.on(VERIFY_PASSCODE, async ({ roomId, passcode }, callback) => {
+    const room = getRoom(roomId);
+  
+    bcrypt.compare(passcode, room.passcode)
+    .then((result) => {
+      if (result === true) return callback('CORRECT_PASSCODE', true);
+      callback('INCORRECT_PASSCODE', false);
+    });
+  });
+
+  socket.on(JOIN, ({ username, roomId }) => {
+    const room = getRoom(roomId);
 
     const { user } = addUser({ id: socket.id, username, roomId });
 
@@ -180,46 +187,46 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on('SET_ROOM_PASSCODE', (passcode) => {
+  socket.on(SET_ROOM_PASSCODE, (passcode) => {
     const room = getRoom(socket.roomId);
+    if (socket.id !== room.host) return;
+    
     bcrypt.hash(passcode, 10)
     .then((hash) => {
       room.passcode = hash;
-      console.log(hash);
       sendClientSuccessNotification('Room passcode set.');
-      console.log(room);
     })
     .catch((error) => console.error('Error generating a hash: ', error));
   });
 
   socket.on('disconnect', () => {
       const user = removeUser(socket.id);
-      const room = getRoom(socket.roomId);
-      
-      const userWasAdmin = socket.id === room.host;
-      const users = getAllUsersInRoom(user.roomId);
-
-      if (userWasAdmin && users.length > 0) {
-        room.host = users[0].id;
-
-        io.in(user.roomId).emit(SET_HOST, room.host);
-        io.in(user.roomId).emit(MESSAGE, {
-          type: 'NEW_HOST',
-          content: `${users[0].username} is now the host. 👑`
-        });
-      } else if (users.length === 0) removeRoom(socket.roomId);
-      
       if (user) {
-        const users = getAllUsersInRoom(user.roomId);
+        const room = getRoom(socket.roomId);
 
-        io.in(user.roomId).emit(MESSAGE, {
-          type: 'SERVER_USER-LEFT',
-          content: `${user.username} has left the room.`
-        });
+				const userWasAdmin = socket.id === room.host;
+				const users = getAllUsersInRoom(user.roomId);
 
-        io.in(user.roomId).emit(GET_USERS, users);
+				if (userWasAdmin && users.length > 0) {
+					room.host = users[0].id;
+
+					io.in(user.roomId).emit(SET_HOST, room.host);
+					io.in(user.roomId).emit(MESSAGE, {
+						type: 'NEW_HOST',
+						content: `${users[0].username} is now the host. 👑`,
+					});
+				} else if (users.length === 0) {
+					removeRoom(socket.roomId);
+				}
+
+				io.in(user.roomId).emit(MESSAGE, {
+					type: 'SERVER_USER-LEFT',
+					content: `${user.username} has left the room.`,
+				});
+
+				io.in(user.roomId).emit(GET_USERS, users);
       };
     });
 });
 
-server.listen(PORT, () => console.log('Server is listening on :' + PORT));
+server.listen(PORT, () => console.log('Server is listening on: ' + PORT));

@@ -61,29 +61,23 @@ export class VideoRoom extends Component {
 	};
 
 	componentDidMount() {
-		const { roomId, username, history } = this.props;
-		if (!(roomId && username)) return history.push('/join');
+		const { authorized, history } = this.props;
+		if (!authorized) return history.push('/join');
 	};
 
 	componentWillUnmount() {
 		if (this.state.socket) {
 			this.state.socket.removeAllListeners();
-			this.props.setInfo({});
+			this.props.setAuthorized(false);
 		};
 	};
 
 	onSocketMethods = (socket) => {
-		const { roomId, username, history } = this.props;
+		const { roomId, username } = this.props;
 		const { player } = this.state;
-
-		console.log(history);
 		
 		socket.on('connect', () => {
 			socket.emit(JOIN, { roomId, username });
-		});
-
-		socket.on('REDIRECT_TO_JOIN_PAGE_ROOM', () => {
-			history.push('/join-room-passcode');
 		});
 
 		socket.on('error', (error) => console.error(error));

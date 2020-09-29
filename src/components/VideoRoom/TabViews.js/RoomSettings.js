@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const RoomSettings = ({ socket }) => {
+const RoomSettings = ({ socket, host }) => {
     const [roomPasscode, setRoomPasscode] = useState('');
     const [maxRoomSize, setMaxRoomSize] = useState(20);
 
@@ -27,6 +27,7 @@ const RoomSettings = ({ socket }) => {
 						value={maxRoomSize}
 						id='max-room-size'
 						onChange={handleOnChangeMaxRoomSize}
+						disabled={socket.id !== host}
 					/>
 				</li>
 				<li>
@@ -36,6 +37,7 @@ const RoomSettings = ({ socket }) => {
 						id='room-passcode'
                         value={roomPasscode}
 						onChange={handleOnChangeRoomPasscode}
+						disabled={socket.id !== host}
 					/>
 				</li>
 			</ul>

@@ -1,4 +1,4 @@
-const rooms = [{ host: 'Test', id: 'Test', passcode: 'test', numberOfUsers: 1, playlist: [] }];
+const rooms = [{ host: 'Test', id: 'Test', passcode: 'Test', numberOfUsers: 1, playlist: [] }];
 
 const addRoom = ({ host, id, users }) => {
 

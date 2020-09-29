@@ -44,7 +44,7 @@ const CurrentTab = ({
 					handleChangeVideo={handleChangeVideo}
 				/>
 			)}
-			{tab === 'room-settings' && <RoomSettings socket={socket} />}
+			{tab === 'room-settings' && <RoomSettings socket={socket} host={host} />}
 		</div>
 	);
 };

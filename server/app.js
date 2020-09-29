@@ -2,11 +2,16 @@ const express = require('express');
 const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
+const bcrypt = require('bcrypt');
 
-const { addUser, removeUser, getUser, getAllUsersInRoom, leaveAllRooms } = require('./actions/userActions');
+const { addUser, removeUser, getUser, getAllUsersInRoom } = require('./actions/userActions');
 const { addRoom, removeRoom, getRoom } = require('./actions/roomActions');
 
 const {
+  CHECK_IF_ROOM_REQUIRES_PASSCODE,
+  REQUIRES_PASSCODE,
+  VERIFY_PASSCODE,
+  SET_ROOM_PASSCODE,
 	PLAY,
   JOIN,
 	PAUSE,
@@ -19,11 +24,12 @@ const {
   NEW_USER_JOINED,
   SET_HOST,
   SET_NEW_HOST,
-  NOTIFY_CLIENT,
+  NOTIFY_CLIENT_SUCCESS,
+	NOTIFY_CLIENT_ERROR,
   GET_PLAYLIST,
   ADD_TO_PLAYLIST,
   REMOVE_FROM_PLAYLIST,
-  GET_USERS
+  GET_USERS,
 } = require('./SocketActions');
 
 const PORT = process.env.PORT || 5000;
@@ -32,14 +38,40 @@ app.use(express.static(__dirname + '/../../build'));
 
 io.on('connection', (socket) => {
 
-  const sendClientNotification = (message) => {
-    socket.emit(NOTIFY_CLIENT, message);
+  const sendClientErrorNotification = (message) => {
+    socket.emit(NOTIFY_CLIENT_ERROR, message);
   };
-  
-  socket.on(JOIN, ({ username, roomId }) => {
-    const { user } = addUser({ id: socket.id, username, roomId });
+
+  const sendClientSuccessNotification = (message) => {
+    socket.emit(NOTIFY_CLIENT_SUCCESS, message);
+  };
+
+  socket.on(CHECK_IF_ROOM_REQUIRES_PASSCODE, (roomId, callback) => {
+    const room = getRoom(roomId);
     
-    leaveAllRooms(socket);
+    if (room && room.passcode) {
+      return callback(REQUIRES_PASSCODE, true);
+    };
+    callback(null, false);
+  });
+
+  socket.on(VERIFY_PASSCODE, async ({ roomId, passcode }, callback) => {
+    const room = getRoom(roomId);
+    
+    bcrypt.compare(passcode, room.passcode)
+    .then((result) => {
+      if (result === true) return callback('CORRECT_PASSCODE', true);
+      callback('INCORRECT_PASSCODE', false);
+    });
+  });
+
+  socket.on(JOIN, ({ username, roomId }) => {
+    const room = getRoom(roomId);
+
+    const { user } = addUser({ id: socket.id, username, roomId });
+
+    //leaveAllRooms(socket);
+    socket.leaveAll();
     socket.join(user.roomId);
     socket.roomId = user.roomId;
     
@@ -52,12 +84,13 @@ io.on('connection', (socket) => {
     
     const users = getAllUsersInRoom(user.roomId);
     
-    const room = getRoom(socket.roomId);
     if (!room) addRoom({ id: user.roomId, users });
     const { host } = getRoom(socket.roomId);
 
     io.in(user.roomId).emit(SET_HOST, host);
     io.in(user.roomId).emit(GET_USERS, users);
+    socket.emit(GET_VIDEO_INFORMATION);
+		socket.emit(GET_PLAYLIST);
   });
 
   socket.on(SET_NEW_HOST, (newHost) => {
@@ -88,7 +121,7 @@ io.on('connection', (socket) => {
     //const room = getRoom(socket.roomId);
 
     //if (socket.id !== room.host) return;
-    
+
     const user = getUser(socket.id);
     socket.to(user.roomId).emit(PAUSE);    
   });
@@ -103,7 +136,7 @@ io.on('connection', (socket) => {
     const room = getRoom(socket.roomId);
 
     if (socket.id !== room.host) {
-      return sendClientNotification('Only the host can change videos 😉');
+      return sendClientErrorNotification('Only the host can change videos 😉');
     };
 
     const user = getUser(socket.id);
@@ -154,36 +187,48 @@ io.on('connection', (socket) => {
     });
   });
 
+  socket.on(SET_ROOM_PASSCODE, (passcode) => {
+    const room = getRoom(socket.roomId);
+    if (socket.id !== room.host) return;
+    
+    bcrypt.hash(passcode, 10)
+    .then((hash) => {
+      room.passcode = hash;
+      sendClientSuccessNotification('Room passcode set.');
+    })
+    .catch((error) => console.error('Error generating a hash: ', error));
+  });
+
   socket.on('disconnect', () => {
       const user = removeUser(socket.id);
-      const room = getRoom(socket.roomId);
-      
-      const userWasAdmin = socket.id === room.host;
-      const users = getAllUsersInRoom(user.roomId);
-
-      if (userWasAdmin && users.length > 0) {
-        room.host = users[0].id;
-
-        io.in(user.roomId).emit(SET_HOST, room.host);
-        io.in(user.roomId).emit(MESSAGE, {
-          type: 'NEW_HOST',
-          content: `${users[0].username} is now the host. 👑`
-        });
-      } else if (users.length === 0) removeRoom(socket.roomId);
-      
       if (user) {
-        const users = getAllUsersInRoom(user.roomId);
+        const room = getRoom(socket.roomId);
 
-        io.in(user.roomId).emit(MESSAGE, {
-          type: 'SERVER_USER-LEFT',
-          content: `${user.username} has left the room.`
-        });
+				const userWasAdmin = socket.id === room.host;
+				const users = getAllUsersInRoom(user.roomId);
 
-        io.in(user.roomId).emit(GET_USERS, users);
+				if (userWasAdmin && users.length > 0) {
+					room.host = users[0].id;
+
+					io.in(user.roomId).emit(SET_HOST, room.host);
+					io.in(user.roomId).emit(MESSAGE, {
+						type: 'NEW_HOST',
+						content: `${users[0].username} is now the host. 👑`,
+					});
+				} else if (users.length === 0) {
+					removeRoom(socket.roomId);
+				}
+
+				io.in(user.roomId).emit(MESSAGE, {
+					type: 'SERVER_USER-LEFT',
+					content: `${user.username} has left the room.`,
+				});
+
+				io.in(user.roomId).emit(GET_USERS, users);
       };
     });
 });
 
-server.listen(PORT, () => console.log('Server is listening on :' + PORT));
+server.listen(PORT, () => console.log('Server is listening on: ' + PORT));
 
 module.exports = server;

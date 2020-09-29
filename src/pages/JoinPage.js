@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import shortid from 'shortid';
 import queryString from 'query-string';
+import { CHECK_IF_ROOM_REQUIRES_PASSCODE } from '../SocketActions';
 
-const JoinPage = ({ handleSetCredentials }) => {
+const JoinPage = ({ socket, handleSetCredentials, setAuthorized }) => {
     const history = useHistory();
     const location = useLocation();
     const [username, setUsername] = useState('');
@@ -45,8 +46,15 @@ const JoinPage = ({ handleSetCredentials }) => {
         if (!/^[a-zA-Z0-9_-]{1,30}$/.test(username)) return;
         if (roomId.length > 150) return;
 
-        handleSetCredentials(username, roomId);
-        history.push('/');
+		socket.emit(CHECK_IF_ROOM_REQUIRES_PASSCODE, roomId, (result) => {
+			if (result === 'REQUIRES_PASSCODE') {
+				return history.push('/join-room-passcode', { username, roomId });
+			} else if (!result) {
+				handleSetCredentials(username, roomId);
+				setAuthorized(true);
+				history.push('/');
+			}
+		});
     };
 
     return (
