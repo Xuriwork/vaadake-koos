@@ -41,15 +41,19 @@ io.on('connection', (socket) => {
 
   const sendClientUnsuccessNotification = (message) => {
     socket.emit(NOTIFY_CLIENT_ERROR, message);
+  };  
+
+  const sendClientSuccessNotification = (message) => {
+    socket.emit(NOTIFY_CLIENT_SUCCESS, message);
   };
-  
+
   socket.on(CHECK_IF_ROOM_REQUIRES_PASSCODE, (roomId, callback) => {
     const room = getRoom(roomId);
     
     if (room && room.passcode) {
       return callback(REQUIRES_PASSCODE, true);
     };
-    
+
     callback(null, false);
   });
 
@@ -184,31 +188,33 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on(SET_ROOM_PASSCODE, (passcode, callback) => {
+  socket.on(SET_ROOM_PASSCODE, (passcode) => {
     const room = getRoom(socket.roomId);
     if (socket.id !== room.host) return;
 
-    if (passcode.length > 50) return callback(false);
+    if (passcode.length > 50) {
+      return sendClientUnsuccessNotification('Room Passcode can only be up to 50 characters');
+    };
     
     bcrypt.hash(passcode, 10)
     .then((hash) => room.passcode = hash)
     .catch((error) => console.error('Error generating a hash: ', error));
   });
 
-  socket.on(SET_MAX_ROOM_SIZE, (newMaxRoomSize, callback) => {
+  socket.on(SET_MAX_ROOM_SIZE, (newMaxRoomSize) => {
     const room = getRoom(socket.roomId);
     if (socket.id !== room.host) return;
 
     if (newMaxRoomSize > 20) {
-      return callback('OVER_MAX_AMOUNT', false);
+      return sendClientUnsuccessNotification('Max room size must be under 20.');
     };
 
     if (newMaxRoomSize < room.numberOfUsers) {
-      callback('NUMBER_OF_CURRENT_USERS_IS_HIGHER', false);
-    } else {
-      room.maxRoomSize = newMaxRoomSize;
-      callback('SAVED', true);
+     return sendClientUnsuccessNotification('The number of current users is too high.', false);
     };
+    
+    room.maxRoomSize = newMaxRoomSize;
+    sendClientSuccessNotification('Room settings saved successfully');
   });
 
   socket.on('disconnect', () => {
