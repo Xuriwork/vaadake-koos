@@ -23,4 +23,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 src/services/firebase.js
-
+hosting.*
+firebase-debug.log
+.vscode
+.env

@@ -6,6 +6,7 @@ import 'notyf/notyf.min.css';
 
 import Header from './components/Header/Header';
 import JoinPage from './pages/JoinPage';
+import JoinPageRoomPasscode from './pages/JoinPageRoomPasscode';
 import RoomPage from './pages/VideoRoomPage';
 import NotFoundPage from './pages/NotFoundPage';
 
@@ -25,6 +26,7 @@ const App = () => {
 				<Switch>
 					<Route exact path='/' component={() => <RoomPage username={info.username} roomId={info.roomId} setInfo={setInfo} />} />
 					<Route path='/join' component={() => <JoinPage handleSetCredentials={handleSetCredentials} />} />
+					<Route path='/join-room-passcode' component={() => <JoinPageRoomPasscode handleSetCredentials={handleSetCredentials} />} />
 					<Route component={NotFoundPage} />
 				</Switch>
 			</div>

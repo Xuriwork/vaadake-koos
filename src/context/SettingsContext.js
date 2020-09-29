@@ -9,7 +9,7 @@ const SettingsContext = React.createContext();
 const SettingsProvider = ({ children }) => {
 
     const [volume, setVolume] = useLocalStorage(0.5, 'volume');
-    const [chatHidden, setChatHidden] = useLocalStorage(false, 'chatHidden');
+    const [tabContentHidden, setTabContentHidden] = useLocalStorage(false, 'hidden');
     const [theme, setTheme] = useLocalStorage('light', 'theme');
 
     const [playUserJoinedSound] = useSound(UserJoinedSoundEffect, { volume });
@@ -34,9 +34,9 @@ const SettingsProvider = ({ children }) => {
         <SettingsContext.Provider 
         value={{ 
             theme, 
-            chatHidden, 
+            tabContentHidden, 
             setTheme, 
-            setChatHidden,
+            setTabContentHidden,
             volume,
             handleVolumeChange,
             playUserJoinedSound

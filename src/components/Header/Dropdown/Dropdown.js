@@ -10,7 +10,7 @@ import { LayoutIcon, PaletteIcon } from './DropdownIcons';
 import ToggleSoundEffect from '../../../assets/audio/switch-sound.mp3';
 
 const Dropdown = ({ dropdownOpen, closeDropdown, dropdownButtonRef }) => {
-	const { theme, chatHidden, setTheme, setChatHidden, volume } = useSettings();
+	const { theme, tabContentHidden, setTheme, setTabContentHidden, volume } = useSettings();
 	const [playToggleSound] = useSound(ToggleSoundEffect, { volume });
     const toggleChatButtonRef = useRef(null);
 	const toggleDarkModeButtonRef = useRef(null);
@@ -36,11 +36,11 @@ const Dropdown = ({ dropdownOpen, closeDropdown, dropdownButtonRef }) => {
 			const ToggledOn = button.children[0];
 			const ToggledOff = button.children[1];
 
-			if (chatHidden) ToggledOff.classList.add('toggled');
+			if (tabContentHidden) ToggledOff.classList.add('toggled');
 			else ToggledOn.classList.add('toggled');
 		};
 
-	}, [dropdownOpen, chatHidden]);
+	}, [dropdownOpen, tabContentHidden]);
 
 	useEffect(() => {
 		const handleClick = (e) => {
@@ -63,15 +63,15 @@ const Dropdown = ({ dropdownOpen, closeDropdown, dropdownButtonRef }) => {
 		playToggleSound();
 	};
 
-	const toggleShowChat = () => {
-		toggleButton(toggleChatButtonRef, 'toggleChatButton', setChatHidden);
+	const toggleShowTabContent = () => {
+		toggleButton(toggleChatButtonRef, 'toggleChatButton', setTabContentHidden);
 		playToggleSound();
 	};
 
 	const LayoutSettings = [
 		{
-			name: 'Chat',
-			onClick: toggleShowChat,
+			name: 'Tab Content',
+			onClick: toggleShowTabContent,
 			ref: toggleChatButtonRef,
 			buttonOptions: ['Show', 'Hide'],
 		}

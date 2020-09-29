@@ -8,12 +8,14 @@ const addRoom = ({ host, id, users }) => {
     const room = { host, id, numberOfUsers: users.length };
     rooms.push(room);
 
-    console.log('rooms', rooms);
-
     return { room };
 };
 
+const removeRoom = (id) => {
+    const index = rooms.findIndex((room) => room.id === id);
+    if (index !== -1) return rooms.splice(index, 1)[0];
+};
 
 const getRoom = (roomId) => rooms.filter((room) => room.id === roomId)[0];
 
-module.exports = { addRoom, getRoom };
+module.exports = { addRoom, getRoom, removeRoom };

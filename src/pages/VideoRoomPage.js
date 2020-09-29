@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import io from 'socket.io-client';
 import YouTube from 'react-youtube';
+import { notyfError, notyfSuccess } from '../utils/notyf';
 
 import {
 	PLAY,
@@ -14,17 +15,21 @@ import {
 	SYNC_VIDEO_INFORMATION,
 	SEND_MESSAGE,
 	MESSAGE,
-	GET_ROOM_DATA,
+	GET_USERS,
 	NEW_USER_JOINED,
 	SET_HOST,
-	SET_NEW_HOST
-} from '../Commands';
+	SET_NEW_HOST,
+	NOTIFY_CLIENT_SUCCESS,
+	NOTIFY_CLIENT_ERROR,
+	GET_PLAYLIST,
+	ADD_TO_PLAYLIST,
+	REMOVE_FROM_PLAYLIST
+} from '../SocketActions';
 
 import { SettingsContext } from '../context/SettingsContext';
 import Loading from '../components/Loading';
-import Chat from '../components/Chat/Chat';
-
-import UserJoinedSoundEffect from '../assets/audio/user-joined-sound.mp3';
+import Tabs from '../components/VideoRoom/Tabs/Tabs';
+import CurrentTab from '../components/VideoRoom/CurrentTab';
 
 const socketURL = process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : process.env.REACT_APP_GAE_API_URL;
 const URL_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)/;
@@ -49,7 +54,10 @@ export class VideoRoom extends Component {
 		users: [],
 		messages: [],
 		host: null,
+		videoURL: '',
 		loading: true,
+		tab: 'chat',
+		playlist: [],
 	};
 
 	componentDidMount() {
@@ -61,17 +69,27 @@ export class VideoRoom extends Component {
 		if (this.state.socket) {
 			this.state.socket.removeAllListeners();
 			this.props.setInfo({});
-		}
+		};
 	};
 
 	onSocketMethods = (socket) => {
-		const { roomId, username } = this.props;
+		const { roomId, username, history } = this.props;
 		const { player } = this.state;
+
+		console.log(history);
 		
 		socket.on('connect', () => {
 			socket.emit(JOIN, { roomId, username });
-			socket.emit(GET_VIDEO_INFORMATION);
 		});
+
+		socket.on('REDIRECT_TO_JOIN_PAGE_ROOM', () => {
+			history.push('/join-room-passcode');
+		});
+
+		socket.on('error', (error) => console.error(error));
+
+		socket.on(NOTIFY_CLIENT_ERROR, (message) => notyfError(message, 5000));
+		socket.on(NOTIFY_CLIENT_SUCCESS, (message) => notyfSuccess(message, 5000));
 
 		socket.on(NEW_USER_JOINED, () => this.context.playUserJoinedSound());
 
@@ -105,11 +123,11 @@ export class VideoRoom extends Component {
 
 		socket.on(MESSAGE, (data) => this.getMessages(data));
 
-		socket.on(GET_ROOM_DATA, ({ roomId, users }) => {
-			this.setState({ roomId, users });
-		});
+		socket.on(GET_USERS, (users) => this.setState({ users }));
 
 		socket.on(SET_HOST, (host) => this.setState({ host }));
+
+		socket.on(GET_PLAYLIST, (playlist) => this.setState({ playlist }));
 	};
 
 	onReady = (e) => {
@@ -124,12 +142,14 @@ export class VideoRoom extends Component {
 
 	convertURLToYoutubeVideoId = (url) => {
 		let id = '';
+
 		url = url.replace(/(>|<)/gi,'').split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
-	
+
 		if(url[2] !== undefined) {
 			id = url[2].split(/[^0-9a-z_-]/i);
 			id = id[0];
 		} else id = url;
+
 		return id;
 	};
 
@@ -143,10 +163,19 @@ export class VideoRoom extends Component {
 		}
 	};
 
-	handleChangeVideo = (e) => {
-		e.preventDefault();
-		if (!URL_REGEX.test(this.urlInput.value)) return;
-		this.state.socket.emit(NEW_VIDEO, this.urlInput.value);
+	handleOnChangeVideoURL = (e) => this.setState({ videoURL: e.target.value });
+
+	handleChangeVideo = (videoId) => {
+		if (videoId) {
+			return this.state.socket.emit(NEW_VIDEO, videoId);
+		} else if (!URL_REGEX.test(this.state.videoURL)) {
+			return notyfError('Invalid URL', 5000);
+		};
+		this.state.socket.emit(NEW_VIDEO, this.state.videoURL);
+	};
+
+	handleOnKeyDown = (e) => {
+    	if (e.keyCode === 13) this.handleChangeVideo();
 	};
 
 	getMessages = (data) => {
@@ -163,6 +192,12 @@ export class VideoRoom extends Component {
 		});
 	};
 
+	addToPlaylist = (video) => this.state.socket.emit(ADD_TO_PLAYLIST, video);
+
+	removeFromPlaylist = (videoId) => {
+		this.state.socket.emit(REMOVE_FROM_PLAYLIST, videoId)
+	};
+
 	sendMessage = (message) => {
 		this.state.socket.emit(SEND_MESSAGE, {
 			content: message,
@@ -170,15 +205,7 @@ export class VideoRoom extends Component {
 		});
 	};
 
-	playUserJoinedSound = () => {
-		const audio = new Audio(UserJoinedSoundEffect);
-		audio.play();
-	};
-
-	handleSetNewHost = (userId) => {
-		console.log(userId);
-		this.state.socket.emit(SET_NEW_HOST, userId);
-	};
+	handleSetNewHost = (userId) => this.state.socket.emit(SET_NEW_HOST, userId);
 
 	onStateChanged = () => {
 		const { player, socket } = this.state;
@@ -205,17 +232,20 @@ export class VideoRoom extends Component {
 			break;
 		}
 	};
+
+	setTab = (tab) => this.setState({ tab });
 	
 	render() {	
 		
-		const { loading, messages, users, socket, host } = this.state;
+		const { loading, messages, users, socket, host, tab, playlist, videoURL } = this.state;
 
 		return (
 			<>
 				{ loading && <Loading /> }
-				<div className='room-page'>
-					<div className='video-and-chat-container'>
-						<div className='video-and-input-container' data-chatishidden={this.context.chatHidden}>
+				<Tabs setTab={this.setTab} />
+				<div className='video-room-page'>
+					<div className='video-and-current-tab-container'>
+						<div className='video-and-input-container' data-chatishidden={this.context.tabContentHidden}>
 							<div className='embed-responsive embed-responsive-16by9'>
 								<YouTube
 									videoId='_hql7mO-zaA'
@@ -226,26 +256,34 @@ export class VideoRoom extends Component {
 									className='embed-responsive'
 								/>
 							</div>
-							<div className='change-video-container'>
+							<div className='change-video-input-container'>
 								<input
 									type='text'
 									placeholder='Enter YouTube Video URL'
 									pattern='https://.*'
-									ref={(input) => this.urlInput = input}
+									value={videoURL}
+									onChange={this.handleOnChangeVideoURL}
+									onKeyDown={this.handleOnKeyDown}
 								/>
 								<button onClick={this.handleChangeVideo}>Change Video</button>
 							</div>
 						</div>
-						{!this.context.chatHidden && (
-							<Chat
+						{
+							!this.context.tabContentHidden && (
+							<CurrentTab
+								tab={tab}
 								messages={messages}
 								users={users}
 								socket={socket}
 								sendMessage={this.sendMessage}
 								host={host}
 								handleSetNewHost={this.handleSetNewHost}
+								playlist={playlist}
+								removeFromPlaylist={this.removeFromPlaylist}
+								addToPlaylist={this.addToPlaylist}
+								handleChangeVideo={this.handleChangeVideo}
 							/>
-						)}
+							)}
 					</div>
 				</div>
 			</>

@@ -9,7 +9,6 @@ const JoinPage = ({ handleSetCredentials }) => {
     const [username, setUsername] = useState('');
     const [roomId, setRoomId] = useState('');
     const [hideRoomIdInput, setHideRoomIdInput] = useState(false);
-    const formContainerStyles = hideRoomIdInput ? 'join-form-container show-only-name-input' : 'join-form-container';
 
     useEffect(() => {
         const getRoomId = () => {
@@ -51,39 +50,43 @@ const JoinPage = ({ handleSetCredentials }) => {
     };
 
     return (
-        <div className='join-page'>
-            <div className={formContainerStyles}>
-                <form>
-                    {!hideRoomIdInput && (
-                        <>
-                            <label>Room Id</label>
-                            <input 
-                                type='text' 
-                                name='roomId' 
-                                value={roomId} 
-                                onChange={handleOnChangeRoomId} 
-                            />
-                            <button 
-                                className='generate-random-roomId-button' 
-                                onClick={handleGenerateRandomRoomId}
-                            >
-                                Generate Random Room Id
-                            </button>
-                        </>
-                    )}
-                    <label>Name</label>
-                    <input 
-                        type='text' 
-                        name='name' 
-                        value={username} 
-                        onChange={handleOnChangeUsername} 
-                        onKeyDown={preventDefault}   
-                    />
-                    <button className='join-button' onClick={joinRoom}>Join</button>
-                </form>
-            </div>
-        </div>
-    )
+			<div className='join-page'>
+				<div className='join-form-container'>
+					<form>
+						{!hideRoomIdInput && (
+							<>
+								<label htmlFor='roomId'>Room Id</label>
+								<input
+									type='text'
+									name='roomId'
+									id='roomId'
+									value={roomId}
+									onChange={handleOnChangeRoomId}
+								/>
+								<button
+									className='generate-random-roomId-button'
+									onClick={handleGenerateRandomRoomId}
+								>
+									Generate Random Room Id
+								</button>
+							</>
+						)}
+						<label htmlFor='name'>Name</label>
+						<input
+							type='text'
+							name='name'
+							id='name'
+							value={username}
+							onChange={handleOnChangeUsername}
+							onKeyDown={preventDefault}
+						/>
+						<button className='join-button' onClick={joinRoom}>
+							Join
+						</button>
+					</form>
+				</div>
+			</div>
+		);
 }
 
 export default JoinPage;

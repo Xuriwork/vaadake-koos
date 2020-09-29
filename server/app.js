@@ -1,9 +1,10 @@
 const express = require('express');
 const app = express();
 const server = require('http').Server(app);
-const io = module.exports.io = require('socket.io')(server);
+const io = require('socket.io')(server);
+
 const { addUser, removeUser, getUser, getAllUsersInRoom, leaveAllRooms } = require('./actions/userActions');
-const { addRoom, getRoom } = require('./actions/roomActions');
+const { addRoom, removeRoom, getRoom } = require('./actions/roomActions');
 
 const {
 	PLAY,
@@ -15,11 +16,15 @@ const {
 	SYNC_VIDEO_INFORMATION,
 	SEND_MESSAGE,
 	MESSAGE,
-	GET_ROOM_DATA,
   NEW_USER_JOINED,
   SET_HOST,
-  SET_NEW_HOST
-} = require('./Commands');
+  SET_NEW_HOST,
+  NOTIFY_CLIENT,
+  GET_PLAYLIST,
+  ADD_TO_PLAYLIST,
+  REMOVE_FROM_PLAYLIST,
+  GET_USERS
+} = require('./SocketActions');
 
 const PORT = process.env.PORT || 5000;
 
@@ -27,6 +32,10 @@ app.use(express.static(__dirname + '/../../build'));
 
 io.on('connection', (socket) => {
 
+  const sendClientNotification = (message) => {
+    socket.emit(NOTIFY_CLIENT, message);
+  };
+  
   socket.on(JOIN, ({ username, roomId }) => {
     const { user } = addUser({ id: socket.id, username, roomId });
     
@@ -48,7 +57,7 @@ io.on('connection', (socket) => {
     const { host } = getRoom(socket.roomId);
 
     io.in(user.roomId).emit(SET_HOST, host);
-    io.in(user.roomId).emit(GET_ROOM_DATA, { roomId: user.roomId, users });
+    io.in(user.roomId).emit(GET_USERS, users);
   });
 
   socket.on(SET_NEW_HOST, (newHost) => {
@@ -67,11 +76,19 @@ io.on('connection', (socket) => {
   });
 
   socket.on(PLAY, () => {
+    //const room = getRoom(socket.roomId);
+
+    //if (socket.id !== room.host) return;
+    
     const user = getUser(socket.id);
     socket.to(user.roomId).emit(PLAY);
   });
 
   socket.on(PAUSE, () => {
+    //const room = getRoom(socket.roomId);
+
+    //if (socket.id !== room.host) return;
+    
     const user = getUser(socket.id);
     socket.to(user.roomId).emit(PAUSE);    
   });
@@ -82,6 +99,13 @@ io.on('connection', (socket) => {
   });
 
   socket.on(NEW_VIDEO, (videoURL) => {
+
+    const room = getRoom(socket.roomId);
+
+    if (socket.id !== room.host) {
+      return sendClientNotification('Only the host can change videos 😉');
+    };
+
     const user = getUser(socket.id);
     io.to(user.roomId).emit(NEW_VIDEO, videoURL);
   });
@@ -96,6 +120,31 @@ io.on('connection', (socket) => {
     io.to(user.roomId).emit(SYNC_VIDEO_INFORMATION, data);
   });
 
+  socket.on(GET_PLAYLIST, () => {
+    const room = getRoom(socket.roomId);
+    socket.emit(GET_PLAYLIST, room.playlist);
+  });
+
+  socket.on(ADD_TO_PLAYLIST, (data) => {
+    const room = getRoom(socket.roomId);
+
+    const videoExist = room.playlist.find((video) => video.id === data.id);
+    if (!!videoExist) return;
+
+    room.playlist.push(data);
+    io.to(socket.roomId).emit(GET_PLAYLIST, room.playlist);
+  });
+
+  socket.on(REMOVE_FROM_PLAYLIST, (data) => {
+    const room = getRoom(socket.roomId);
+    const playlist = room.playlist;
+
+    const index = playlist.findIndex((video) => video.id === data);
+    if (index !== -1) playlist.splice(index, 1);
+
+    io.to(socket.roomId).emit(GET_PLAYLIST, playlist);
+  });
+
   socket.on(SEND_MESSAGE, (data) => {
     const user = getUser(socket.id);
     io.in(user.roomId).emit(MESSAGE, { 
@@ -107,18 +156,20 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
       const user = removeUser(socket.id);
-      const userWasAdmin = socket.id === socket.host;
-
+      const room = getRoom(socket.roomId);
+      
+      const userWasAdmin = socket.id === room.host;
       const users = getAllUsersInRoom(user.roomId);
 
       if (userWasAdmin && users.length > 0) {
-        socket.host = users[0].id;
-        io.in(user.roomId).emit(SET_HOST, socket.host);
+        room.host = users[0].id;
+
+        io.in(user.roomId).emit(SET_HOST, room.host);
         io.in(user.roomId).emit(MESSAGE, {
           type: 'NEW_HOST',
           content: `${users[0].username} is now the host. 👑`
         });
-      };
+      } else if (users.length === 0) removeRoom(socket.roomId);
       
       if (user) {
         const users = getAllUsersInRoom(user.roomId);
@@ -128,7 +179,7 @@ io.on('connection', (socket) => {
           content: `${user.username} has left the room.`
         });
 
-        io.in(user.roomId).emit(GET_ROOM_DATA, { roomId: user.roomId, users });
+        io.in(user.roomId).emit(GET_USERS, users);
       };
     });
 });

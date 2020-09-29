@@ -1,19 +1,11 @@
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Notyf } from 'notyf';
+import { notyfError, notyfSuccess } from '../../utils/notyf';
 
 import Logo from '../../assets/images/vaadake_koos_logo.svg';
 import InviteUserIcon from '../../assets/icons/user-add-fill.svg';
 
 import Dropdown from './Dropdown/Dropdown';
-
-const notyf = new Notyf({
-	duration: 2500,
-	position: {
-		x: 'right',
-		y: 'bottom',
-	},
-});
 
 const Header = ({ roomId }) => {
 	const roomIdInputRef = useRef(null);
@@ -27,17 +19,18 @@ const Header = ({ roomId }) => {
 		roomIdInputRef.current.select();
 		document.execCommand('copy');
 		e.target.focus();
-		notyf.success('Copied to clipboard 📋');
+		notyfSuccess('Copied to clipboard 📋', 2500);
 	};
 	
 	const updateClipboard = (textToCopy) => {
 		navigator.clipboard.writeText(textToCopy).then(() => {
-			notyf.success('Copied room link 📋');
-		}, () => notyf.success('Failed to copy invite link 🙁'));
+			notyfSuccess('Copied room link 📋', 2500);
+		}, () => notyfError('Failed to copy invite link 🙁', 3000));
 	};
 
 	const handleCreateInviteCode = () => {
-		const inviteLink = `${window.location.href}join?roomId=${roomId}`;
+		const encodedRoomId = encodeURIComponent(roomId)
+		const inviteLink = `${window.location.href}join?roomId=${encodedRoomId}`;
 		updateClipboard(inviteLink);
 	};
 
@@ -52,7 +45,7 @@ const Header = ({ roomId }) => {
 						ref={roomIdInputRef}
 						defaultValue={roomId}
 						readOnly={true}
-						className='show-connected-roomId-input'
+						className='roomId-code-input'
 						onClick={copyToClipboard}
 					/>
 					<button onClick={handleCreateInviteCode}>
@@ -64,6 +57,7 @@ const Header = ({ roomId }) => {
 				ref={dropdownButtonRef}
 				onClick={toggleDropdown}
 				className='settings-button'
+				aria-label='settings'
 			>
 				<svg
 					xmlns='http://www.w3.org/2000/svg'
