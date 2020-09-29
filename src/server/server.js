@@ -90,8 +90,6 @@ io.on('connection', (socket) => {
 
     io.in(user.roomId).emit(SET_HOST, host);
     io.in(user.roomId).emit(GET_USERS, users);
-    socket.emit(GET_VIDEO_INFORMATION);
-		socket.emit(GET_PLAYLIST);
   });
 
   socket.on(SET_NEW_HOST, (newHost) => {

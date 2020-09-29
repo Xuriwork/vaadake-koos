@@ -53,7 +53,7 @@ const JoinPage = ({ socket, handleSetCredentials, setAuthorized }) => {
 				handleSetCredentials(username, roomId);
 				setAuthorized(true);
 				history.push('/');
-			}
+			};
 		});
     };
 

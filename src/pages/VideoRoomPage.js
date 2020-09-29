@@ -78,6 +78,8 @@ export class VideoRoom extends Component {
 		
 		socket.on('connect', () => {
 			socket.emit(JOIN, { roomId, username });
+			socket.emit(GET_VIDEO_INFORMATION);
+			socket.emit(GET_PLAYLIST);
 		});
 
 		socket.on('error', (error) => console.error(error));
@@ -125,9 +127,8 @@ export class VideoRoom extends Component {
 	};
 
 	onReady = (e) => {
-		this.setState({ player: e.target });
 		const socket = io(socketURL);
-		this.setState({ socket });
+		this.setState({ player: e.target, socket });
 		this.onSocketMethods(socket);
 		this.setState({ loading: false });
 	};
