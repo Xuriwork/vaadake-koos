@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { notyfError, notyfSuccess } from '../utils/notyf';
 import { VERIFY_PASSCODE } from '../SocketActions';
@@ -6,6 +6,13 @@ import { VERIFY_PASSCODE } from '../SocketActions';
 const JoinPageRoomPasscode = ({ socket, setAuthorized, handleSetCredentials }) => {
     const history = useHistory();
     const [roomPasscode, setRoomPasscode] = useState('');
+
+    useEffect(() => {
+        const { state } = history.location;
+        if (!state) return history.push('/join');
+        if (!(state.username && state.roomId)) return history.push('/join');
+
+    }, [history]);
 
     const handleOnChangeRoomPasscode = (e) => setRoomPasscode(e.target.value);
 

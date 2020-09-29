@@ -31,7 +31,7 @@ const App = () => {
 				<Switch>
 					<Route exact path='/' component={() => <RoomPage username={info.username} roomId={info.roomId} authorized={authorized} setAuthorized={setAuthorized} />} />
 					<Route path='/join' component={() => <JoinPage handleSetCredentials={handleSetCredentials} socket={socket} setAuthorized={setAuthorized} />} />
-					<Route path='/join-room-passcode' component={() => <JoinPageRoomPasscode handleSetCredentials={handleSetCredentials} socket={socket} setAuthorized={setAuthorized} />} />
+					<Route path='/enter-passcode' component={() => <JoinPageRoomPasscode handleSetCredentials={handleSetCredentials} socket={socket} setAuthorized={setAuthorized} />} />
 					<Route component={NotFoundPage} />
 				</Switch>
 			</div>

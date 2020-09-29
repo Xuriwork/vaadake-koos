@@ -30,6 +30,7 @@ const {
   ADD_TO_PLAYLIST,
   REMOVE_FROM_PLAYLIST,
   GET_USERS,
+  SET_MAX_ROOM_SIZE,
 } = require('../SocketActions');
 
 const PORT = process.env.PORT || 5000;
@@ -38,9 +39,9 @@ app.use(express.static(__dirname + '/../../build'));
 
 io.on('connection', (socket) => {
 
-  const sendClientErrorNotification = (message) => {
+  const sendClientUnsuccessNotification = (message) => {
     socket.emit(NOTIFY_CLIENT_ERROR, message);
-  };
+  };  
 
   const sendClientSuccessNotification = (message) => {
     socket.emit(NOTIFY_CLIENT_SUCCESS, message);
@@ -52,12 +53,13 @@ io.on('connection', (socket) => {
     if (room && room.passcode) {
       return callback(REQUIRES_PASSCODE, true);
     };
+
     callback(null, false);
   });
 
-  socket.on(VERIFY_PASSCODE, async ({ roomId, passcode }, callback) => {
+  socket.on(VERIFY_PASSCODE, ({ roomId, passcode }, callback) => {
     const room = getRoom(roomId);
-  
+
     bcrypt.compare(passcode, room.passcode)
     .then((result) => {
       if (result === true) return callback('CORRECT_PASSCODE', true);
@@ -70,7 +72,6 @@ io.on('connection', (socket) => {
 
     const { user } = addUser({ id: socket.id, username, roomId });
 
-    //leaveAllRooms(socket);
     socket.leaveAll();
     socket.join(user.roomId);
     socket.roomId = user.roomId;
@@ -136,7 +137,7 @@ io.on('connection', (socket) => {
     const room = getRoom(socket.roomId);
 
     if (socket.id !== room.host) {
-      return sendClientErrorNotification('Only the host can change videos 😉');
+      return sendClientUnsuccessNotification('Only the host can change videos 😉');
     };
 
     const user = getUser(socket.id);
@@ -190,13 +191,34 @@ io.on('connection', (socket) => {
   socket.on(SET_ROOM_PASSCODE, (passcode) => {
     const room = getRoom(socket.roomId);
     if (socket.id !== room.host) return;
+
+    console.log(room);
+
+    if (passcode.length > 50) {
+      return sendClientUnsuccessNotification('Room Passcode can only be up to 50 characters');
+    };
+
+    console.log(passcode)
     
     bcrypt.hash(passcode, 10)
-    .then((hash) => {
-      room.passcode = hash;
-      sendClientSuccessNotification('Room passcode set.');
-    })
+    .then((hash) => room.passcode = hash)
     .catch((error) => console.error('Error generating a hash: ', error));
+  });
+
+  socket.on(SET_MAX_ROOM_SIZE, (newMaxRoomSize) => {
+    const room = getRoom(socket.roomId);
+    if (socket.id !== room.host) return;
+
+    if (newMaxRoomSize > 20) {
+      return sendClientUnsuccessNotification('Max room size must be under 20.');
+    };
+
+    if (newMaxRoomSize < room.numberOfUsers) {
+     return sendClientUnsuccessNotification('The number of current users is too high.', false);
+    };
+    
+    room.maxRoomSize = newMaxRoomSize;
+    sendClientSuccessNotification('Room settings saved successfully');
   });
 
   socket.on('disconnect', () => {

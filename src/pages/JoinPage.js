@@ -48,7 +48,7 @@ const JoinPage = ({ socket, handleSetCredentials, setAuthorized }) => {
 
 		socket.emit(CHECK_IF_ROOM_REQUIRES_PASSCODE, roomId, (result) => {
 			if (result === 'REQUIRES_PASSCODE') {
-				return history.push('/join-room-passcode', { username, roomId });
+				return history.push('/enter-passcode', { username, roomId });
 			} else if (!result) {
 				handleSetCredentials(username, roomId);
 				setAuthorized(true);

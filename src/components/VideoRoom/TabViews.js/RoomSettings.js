@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SET_MAX_ROOM_SIZE, SET_ROOM_PASSCODE } from '../../../SocketActions';
 
 const RoomSettings = ({ socket, host }) => {
     const [roomPasscode, setRoomPasscode] = useState('');
@@ -8,10 +9,13 @@ const RoomSettings = ({ socket, host }) => {
 	const handleOnChangeMaxRoomSize = (e) => setMaxRoomSize(e.target.value);
 
 	const handleSaveSettings = () => {
-        console.log('Room Passcode: ', roomPasscode);
-        console.log('Max Room Size: ', maxRoomSize);
-		
-		socket.emit('SET_ROOM_PASSCODE', roomPasscode);
+		if (roomPasscode.trim() !== '') {
+			socket.emit(SET_ROOM_PASSCODE, roomPasscode);
+		};
+
+		if (maxRoomSize.trim() !== '') {
+			socket.emit(SET_MAX_ROOM_SIZE, maxRoomSize);
+		};
     };
 
 	return (
