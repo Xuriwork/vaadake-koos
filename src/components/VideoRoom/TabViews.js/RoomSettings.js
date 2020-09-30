@@ -14,7 +14,7 @@ const RoomSettings = ({ socket, host }) => {
 		};
 
 		if (maxRoomSize > 0) {
-			socket.emit(SET_MAX_ROOM_SIZE, maxRoomSize);
+			socket.emit(SET_MAX_ROOM_SIZE, (maxRoomSize * 1));
 		};
     };
 

@@ -31,6 +31,7 @@ const {
   REMOVE_FROM_PLAYLIST,
   GET_USERS,
   SET_MAX_ROOM_SIZE,
+  CHECK_IF_ROOM_IS_FULL
 } = require('../SocketActions');
 
 const PORT = process.env.PORT || 5000;
@@ -46,6 +47,16 @@ io.on('connection', (socket) => {
   const sendClientSuccessNotification = (message) => {
     socket.emit(NOTIFY_CLIENT_SUCCESS, message);
   };
+
+  socket.on(CHECK_IF_ROOM_IS_FULL, (roomId, callback) => {
+    const room = getRoom(roomId);
+
+    if (room && room.numberOfUsers === room.maxRoomSize) {
+      return callback('ROOM_IS_FULL', true);
+    };
+
+    callback(null, false);
+  });
 
   socket.on(CHECK_IF_ROOM_REQUIRES_PASSCODE, (roomId, callback) => {
     const room = getRoom(roomId);
@@ -190,13 +201,9 @@ io.on('connection', (socket) => {
     const room = getRoom(socket.roomId);
     if (socket.id !== room.host) return;
 
-    console.log(room);
-
     if (passcode.length > 50) {
       return sendClientUnsuccessNotification('Room Passcode can only be up to 50 characters');
     };
-
-    console.log(passcode)
     
     bcrypt.hash(passcode, 10)
     .then((hash) => room.passcode = hash)

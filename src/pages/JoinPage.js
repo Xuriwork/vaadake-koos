@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import shortid from 'shortid';
 import queryString from 'query-string';
-import { CHECK_IF_ROOM_REQUIRES_PASSCODE } from '../SocketActions';
+import { CHECK_IF_ROOM_REQUIRES_PASSCODE, CHECK_IF_ROOM_IS_FULL } from '../SocketActions';
+import { notyfError } from '../utils/notyf';
 
 const JoinPage = ({ socket, handleSetCredentials, setAuthorized }) => {
     const history = useHistory();
@@ -44,16 +45,23 @@ const JoinPage = ({ socket, handleSetCredentials, setAuthorized }) => {
         
         if (username.trim() === '' || roomId.trim() === '') return;
         if (!/^[a-zA-Z0-9_-]{1,30}$/.test(username)) return;
-        if (roomId.length > 150) return;
+		if (roomId.length > 150) return;
+		
+		socket.emit(CHECK_IF_ROOM_IS_FULL, roomId, (result) => {
 
-		socket.emit(CHECK_IF_ROOM_REQUIRES_PASSCODE, roomId, (result) => {
-			if (result === 'REQUIRES_PASSCODE') {
-				return history.push('/enter-passcode', { username, roomId });
-			} else if (!result) {
-				handleSetCredentials(username, roomId);
-				setAuthorized(true);
-				history.push('/');
+			if (result === 'ROOM_IS_FULL') {
+				return notyfError('Sorry, this room is full', 2500);
 			};
+
+			socket.emit(CHECK_IF_ROOM_REQUIRES_PASSCODE, roomId, (result) => {
+				if (result === 'REQUIRES_PASSCODE') {
+					return history.push('/enter-passcode', { username, roomId });
+				} else if (!result) {
+					handleSetCredentials(username, roomId);
+					setAuthorized(true);
+					history.push('/');
+				};
+			});
 		});
     };
 

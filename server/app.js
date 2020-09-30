@@ -31,6 +31,7 @@ const {
   REMOVE_FROM_PLAYLIST,
   GET_USERS,
   SET_MAX_ROOM_SIZE,
+  CHECK_IF_ROOM_IS_FULL
 } = require('./SocketActions');
 
 const PORT = process.env.PORT || 5000;
@@ -46,6 +47,16 @@ io.on('connection', (socket) => {
   const sendClientSuccessNotification = (message) => {
     socket.emit(NOTIFY_CLIENT_SUCCESS, message);
   };
+
+  socket.on(CHECK_IF_ROOM_IS_FULL, (roomId, callback) => {
+    const room = getRoom(roomId);
+
+    if (room && room.numberOfUsers === room.maxRoomSize) {
+      return callback('ROOM_IS_FULL', true);
+    };
+
+    callback(null, false);
+  });
 
   socket.on(CHECK_IF_ROOM_REQUIRES_PASSCODE, (roomId, callback) => {
     const room = getRoom(roomId);
