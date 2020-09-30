@@ -5,7 +5,7 @@ const addRoom = ({ host, id, users }) => {
     id = id.trim();
 
     if (!host) host = users[0].id;
-    const room = { host, id, numberOfUsers: users.length };
+    const room = { host, id, numberOfUsers: users.length, playlist: [], maxRoomSize: 20 };
     rooms.push(room);
 
     return { room };

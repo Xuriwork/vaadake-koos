@@ -13,7 +13,7 @@ const RoomSettings = ({ socket, host }) => {
 			socket.emit(SET_ROOM_PASSCODE, roomPasscode);
 		};
 
-		if (maxRoomSize.trim() !== '') {
+		if (maxRoomSize > 0) {
 			socket.emit(SET_MAX_ROOM_SIZE, maxRoomSize);
 		};
     };
@@ -45,7 +45,7 @@ const RoomSettings = ({ socket, host }) => {
 					/>
 				</li>
 			</ul>
-			<button onClick={handleSaveSettings}>Save</button>
+			<button onClick={handleSaveSettings} disabled={socket.id !== host}>Save</button>
 		</>
 	);
 };
