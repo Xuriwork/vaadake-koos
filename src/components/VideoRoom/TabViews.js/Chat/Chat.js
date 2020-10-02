@@ -35,9 +35,6 @@ const Chat = ({ messages, sendMessage, users, socket, host, handleSetNewHost }) 
 			const { scrollHeight, offsetHeight, scrollTop } = chatContainer;
 			const containerHeight = scrollHeight - offsetHeight;
 
-			console.log('containerHeight', containerHeight);
-			console.log('scrollTop', scrollTop);
-
 			if (containerHeight <= scrollTop && newMessagePopup) {
 				setNewMessagePopup(false);
 			};

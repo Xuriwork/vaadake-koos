@@ -22,6 +22,7 @@ Project is created with:
 * Google App Engine
 * Firebase
 * Socket.io
+* SCSS
 
 ## Dark Mode Screenshot of the app
 ![Video Screen](./VaadakeKoos_VideoScreen_Preview.png)

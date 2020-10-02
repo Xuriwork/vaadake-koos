@@ -237,7 +237,7 @@ export class VideoRoom extends Component {
 		return (
 			<>
 				{ loading && <Loading /> }
-				<Tabs setTab={this.setTab} />
+				<Tabs tab={tab} setTab={this.setTab} />
 				<div className='video-room-page'>
 					<div className='video-and-current-tab-container'>
 						<div className='video-and-input-container' data-chatishidden={this.context.tabContentHidden}>

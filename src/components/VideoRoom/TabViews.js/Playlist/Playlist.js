@@ -20,11 +20,28 @@ const Playlist = ({ playlist, addToPlaylist, removeFromPlaylist, handleChangeVid
 		return id;
 	};
 
-    const handleAddVideoToPlaylist = () => {
-		if (videoURL.trim() === '') return;
-		if (!URL_REGEX.test(videoURL)) {
-			return notyfError('Invalid URL', 2500);
-		};
+	const videos = [
+		'https://youtu.be/olKJ6_BD10k',
+		'https://youtu.be/pPmW4b9BRuA',
+		'https://youtu.be/X9ybVTw9rtk',
+		'https://youtu.be/oVBL8KgxZU4',
+		'https://youtu.be/X9ybVTw9rtk',
+		'https://youtu.be/HRNNimi1xuY',
+		'https://youtu.be/oTdFsRZg0no',
+		'https://youtu.be/fFlDoutuooI'
+	];
+
+	const test = () => {
+		videos.forEach((video) => {
+			handleAddVideoToPlaylist(video);
+		});
+	};
+
+    const handleAddVideoToPlaylist = (videoURL) => {
+		// if (videoURL.trim() === '') return;
+		// if (!URL_REGEX.test(videoURL)) {
+		// 	return notyfError('Invalid URL', 2500);
+		// };
 
 		const videoId = convertURLToYoutubeVideoId(videoURL);
 
@@ -70,7 +87,7 @@ const Playlist = ({ playlist, addToPlaylist, removeFromPlaylist, handleChangeVid
 						value={videoURL}
 						onKeyDown={handleOnKeyDown}
 					/>
-					<button onClick={handleAddVideoToPlaylist}>Add Video</button>
+					<button onClick={test}>Add Video</button>
 				</div>
 				<ul className='video-playlist'>
 					{playlist.map((video) => (
@@ -84,7 +101,7 @@ const Playlist = ({ playlist, addToPlaylist, removeFromPlaylist, handleChangeVid
 									<PlayVideoIcon />
 								</button>
 							</span>
-							<h3>{video.title}</h3>
+							<h3>{video.title.substring(0, 75)}</h3>
 						</li>
 					))}
 				</ul>
