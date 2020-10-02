@@ -19,8 +19,8 @@
 
 	--gradient-button-180deg-lm: linear-gradient(
 		180deg,
-		#fccb90 0%,
-		#e088f7 120%
+		#eba6f3 0%,
+		#c47cd6 120%
 	);
 	--gradient-button-180deg-dm: linear-gradient(
 		180deg,
@@ -895,6 +895,7 @@ input {
 		background-color: var(--tab-content-background);
 		box-sizing: border-box;
 		border-radius: 10px;
+		position: relative;
 
 		img {
 			width: 100%;
@@ -904,13 +905,16 @@ input {
 
 		h3 {
 			font-size: 1em;
-			margin-top: 10px;
+			margin-top: 5px;
 			color: var(--text);
 		}
 
 		span {
 			display: flex;
 			justify-content: flex-end;
+			position: absolute;
+			top: 20px;
+			left: 20px;
 		}
 
 		button {
