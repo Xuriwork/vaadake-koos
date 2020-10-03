@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { MakeHostIcon, SheildIcon } from './ChatIcons';
-import DownArrowIcon from '../../../../assets/icons/arrow-down-circle-fill.svg';
+import DownArrowIcon from '../../../assets/icons/arrow-down-circle-fill.svg';
 
-const Chat = ({ messages, sendMessage, users, socket, host, handleSetNewHost }) => {
+const Chat = ({ messages, sendMessage, users, socket, host }) => {
 	const [message, setMessage] = useState('');
 	const [newMessagePopup, setNewMessagePopup] = useState(false);
 	const chatContainerRef = useRef(null);
@@ -63,38 +62,10 @@ const Chat = ({ messages, sendMessage, users, socket, host, handleSetNewHost }) 
 		scrollToBottom(true);
 		setMessage('');
 	};
-
-	const filteredUsers = users.filter((user) => user.id !== host);
-	const currentHost = users.filter((user) => user.id === host)[0];
-
+	
 	return (
 		<>
-			<div className='users-list-container'>
-				<h3>Connected Users: {users.length}</h3>
-				<ul>
-					{host && (
-						<li data-isadmin={true}>
-							<SheildIcon />
-							{currentHost?.username}
-						</li>
-					)}
-					{filteredUsers.map((user) => {
-						return (
-							<li key={user.id}>
-								{host === socket.id && user.id !== host && (
-									<button
-										className='add-user-button'
-										onClick={() => handleSetNewHost(user.id)}
-									>
-										<MakeHostIcon />
-									</button>
-								)}
-								{user.username}
-							</li>
-						);
-					})}
-				</ul>
-			</div>
+			
 			<div className='messages-and-input-container'>
 				<div className='messages-container' ref={chatContainerRef}>
 					{messages.map(({ type, content, username, id }, index) => (

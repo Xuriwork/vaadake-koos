@@ -201,6 +201,7 @@ export class VideoRoom extends Component {
 	};
 
 	handleSetNewHost = (userId) => this.state.socket.emit(SET_NEW_HOST, userId);
+	handleKickUser = (userId) => this.state.socket.emit('KICK_USER', userId);
 
 	onStateChanged = () => {
 		const { player, socket } = this.state;
@@ -274,6 +275,7 @@ export class VideoRoom extends Component {
 								sendMessage={this.sendMessage}
 								host={host}
 								handleSetNewHost={this.handleSetNewHost}
+								handleKickUser={this.handleKickUser}
 								playlist={playlist}
 								removeFromPlaylist={this.removeFromPlaylist}
 								addToPlaylist={this.addToPlaylist}

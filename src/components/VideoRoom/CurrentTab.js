@@ -1,7 +1,7 @@
 import React from 'react';
-import Chat from './TabViews.js/Chat/Chat';
+import Chat from './TabViews.js/Chat';
 import Playlist from './TabViews.js/Playlist/Playlist';
-import RoomSettings from './TabViews.js/RoomSettings';
+import RoomSettings from './TabViews.js/RoomSettings/RoomSettings';
 
 const CurrentTab = ({
 	tab,
@@ -12,6 +12,7 @@ const CurrentTab = ({
 	host,
 	sendMessage,
 	handleSetNewHost,
+	handleKickUser,
 	playlist,
 	addToPlaylist,
 	removeFromPlaylist,
@@ -29,15 +30,15 @@ const CurrentTab = ({
 
 	return (
 		<div className={currentTabComponentClassName}>
-		<button onClick={handleSetToChatView} className='close-button'>×</button>
+			<button onClick={handleSetToChatView} className='close-button'>
+				×
+			</button>
 			{tab === 'chat' && (
 				<Chat
 					messages={messages}
 					users={users}
 					socket={socket}
 					sendMessage={sendMessage}
-					host={host}
-					handleSetNewHost={handleSetNewHost}
 				/>
 			)}
 			{tab === 'playlist' && (
@@ -48,7 +49,15 @@ const CurrentTab = ({
 					handleChangeVideo={handleChangeVideo}
 				/>
 			)}
-			{tab === 'room-settings' && <RoomSettings socket={socket} host={host} />}
+			{tab === 'room-settings' && (
+				<RoomSettings
+					socket={socket}
+					host={host}
+					users={users}
+					handleSetNewHost={handleSetNewHost}
+					handleKickUser={handleKickUser}
+				/>
+			)}
 		</div>
 	);
 };
