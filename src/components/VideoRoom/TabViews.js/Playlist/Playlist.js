@@ -6,7 +6,7 @@ import { TrashIcon, PlayVideoIcon } from './PlaylistIcons';
 const YOUTUBE_API_KEY = process.env.REACT_APP_YOUTUBE_API_KEY;
 const URL_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)/;
 
-const Playlist = ({ playlist, addToPlaylist, removeFromPlaylist, handleChangeVideo }) => {
+const Playlist = ({ playlist, addToPlaylist, removeFromPlaylist, handleChangeVideo, setTab }) => {
 	const [videoURL, setVideoURL] = useState('');
 
 	const convertURLToYoutubeVideoId = (url) => {

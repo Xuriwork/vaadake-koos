@@ -267,6 +267,7 @@ export class VideoRoom extends Component {
 							!this.context.tabContentHidden && (
 							<CurrentTab
 								tab={tab}
+								setTab={this.setTab}
 								messages={messages}
 								users={users}
 								socket={socket}

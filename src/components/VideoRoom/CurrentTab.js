@@ -5,6 +5,7 @@ import RoomSettings from './TabViews.js/RoomSettings';
 
 const CurrentTab = ({
 	tab,
+	setTab,
 	messages,
 	users,
 	socket,
@@ -17,6 +18,8 @@ const CurrentTab = ({
 	handleChangeVideo
 }) => {
 
+	const handleSetToChatView = () => setTab('chat');
+
     const currentTabComponentClassName =
 			tab === 'chat'
 				? 'current-tab-component chat-tab'
@@ -26,6 +29,7 @@ const CurrentTab = ({
 
 	return (
 		<div className={currentTabComponentClassName}>
+		<button onClick={handleSetToChatView} className='close-button'>×</button>
 			{tab === 'chat' && (
 				<Chat
 					messages={messages}
