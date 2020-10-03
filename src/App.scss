@@ -996,12 +996,12 @@ input {
 		background-color: #00000067;
 
 		.modal {
+			@extend %flex-complete-center-column;
 			width: 350px;
-			height: 120px;
+			max-width: 95%;
+			height: 160px;
 			background-color: var(--container-bg);
-			@extend %flex-complete-center-row;
 			border-radius: 5px;
-			justify-content: space-evenly;
 			position: relative;
 
 			.close-button {
@@ -1014,14 +1014,16 @@ input {
 				background-color: transparent;
 				line-height: 20px;
 			}
-
+			
 			button:not(.close-button) {
 				padding: 5px 15px;
 				color: #ffffff;
+				width: 200px;
 			}
 
 			button:nth-child(2) {
 				background-color: #05c46b;
+				margin-bottom: 10px;
 			}
 
 			button:nth-child(3) {

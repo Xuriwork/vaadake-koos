@@ -6,7 +6,7 @@ import { SheildIcon } from './SheildIcon';
 const RoomSettings = ({ socket, host, users, handleSetNewHost, handleKickUser }) => {
     const [roomPasscode, setRoomPasscode] = useState('');
 	const [maxRoomSize, setMaxRoomSize] = useState(20);
-	const [userActionModal, setUserActionModal] = useState('');
+	const [userActionModal, setUserActionModal] = useState(null);
 
 	const handleOnChangeRoomPasscode = (e) => setRoomPasscode(e.target.value);
 	const handleOnChangeMaxRoomSize = (e) => setMaxRoomSize(e.target.value);
@@ -29,11 +29,11 @@ const RoomSettings = ({ socket, host, users, handleSetNewHost, handleKickUser })
 		setUserActionModal(userId);
 	};
 
-	const handleCloseModal = () => setUserActionModal('');
+	const handleCloseModal = () => setUserActionModal(null);
 
 	return (
 		<>
-			{userActionModal !== '' && (
+			{userActionModal && (
 				<Modal
 					userId={userActionModal}
 					handleSetNewHost={handleSetNewHost}
