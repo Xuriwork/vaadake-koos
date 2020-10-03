@@ -103,10 +103,10 @@ io.on('connection', (socket) => {
     io.in(user.roomId).emit(GET_USERS, users);
   });
 
+  //WILL FINISH LATER
   socket.on('KICK_USER', (userId) => {
     const user = getUser(userId);
     console.log(user);
-    user.leave(user.roomId);
   });
 
   socket.on(SET_NEW_HOST, (newHost) => {

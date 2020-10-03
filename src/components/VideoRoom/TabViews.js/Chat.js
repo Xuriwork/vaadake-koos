@@ -65,7 +65,6 @@ const Chat = ({ messages, sendMessage, users, socket, host }) => {
 	
 	return (
 		<>
-			
 			<div className='messages-and-input-container'>
 				<div className='messages-container' ref={chatContainerRef}>
 					{messages.map(({ type, content, username, id }, index) => (
