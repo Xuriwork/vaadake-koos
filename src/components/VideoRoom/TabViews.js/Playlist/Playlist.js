@@ -20,7 +20,7 @@ const Playlist = ({ playlist, addToPlaylist, removeFromPlaylist, handleChangeVid
 		return id;
 	};
 
-    const handleAddVideoToPlaylist = (videoURL) => {
+    const handleAddVideoToPlaylist = () => {
 		if (videoURL.trim() === '') return;
 		if (!URL_REGEX.test(videoURL)) {
 			return notyfError('Invalid URL', 2500);
