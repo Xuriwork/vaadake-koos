@@ -81,7 +81,7 @@ io.on('connection', (socket) => {
   socket.on(JOIN, ({ username, roomId }) => {
     const room = getRoom(roomId);
 
-    const { user } = addUser({ id: socket.id, username, roomId, disconnect: socket.disconnect.bind(socket) });
+    const { user } = addUser({ id: socket.id, username, roomId });
 
     socket.leaveAll();
     socket.join(user.roomId);
@@ -103,19 +103,7 @@ io.on('connection', (socket) => {
     io.in(user.roomId).emit(GET_USERS, users);
   });
 
-  //WILL FINISH LATER
-  socket.on('KICK_USER', (userId) => {
-    // const user = getUser(userId);
-    // console.log(user);
-    // console.log(userId);
-    // console.log(socket.id);
-
-    // io.to(user.id).emit('KICKED', 'dasdsaas');
-    // //user.disconnect(true);
-  });
-
   socket.on(SET_NEW_HOST, (newHost) => {
-
     const user = getUser(newHost);
     const room = getRoom(socket.roomId);
 

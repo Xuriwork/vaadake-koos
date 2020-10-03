@@ -89,14 +89,6 @@ export class VideoRoom extends Component {
 
 		socket.on(NEW_USER_JOINED, () => this.context.playUserJoinedSound());
 
-		socket.on('KICKED', (data) => {
-			console.log(data);
-			const { history, setAuthorized } = this.props
-			history.push('/join');
-			setAuthorized(false);
-			alert('You got kicked');
-		});
-
 		socket.on(PLAY, () => player.playVideo());
 
 		socket.on(PAUSE, () => player.pauseVideo());

@@ -104,7 +104,6 @@ io.on('connection', (socket) => {
   });
 
   socket.on(SET_NEW_HOST, (newHost) => {
-
     const user = getUser(newHost);
     const room = getRoom(socket.roomId);
 

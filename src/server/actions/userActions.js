@@ -1,11 +1,11 @@
 const users = [];
 
-const addUser = ({ id, username, roomId, disconnect }) => {
+const addUser = ({ id, username, roomId }) => {
 
     username = username.trim();
     roomId = roomId.trim();
 
-    const user = { id, username, roomId, disconnect };
+    const user = { id, username, roomId };
     users.push(user);
 
     return { user };
