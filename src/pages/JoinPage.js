@@ -46,11 +46,11 @@ const JoinPage = ({ socket, handleSetCredentials, setAuthorized }) => {
 		if (username.trim() === '' || roomId.trim() === '') return;
 		
         if (!/^[a-zA-Z0-9_-]{1,30}$/.test(username)) {
-			return notyfError('Username must be 1-30 characters');
+			return notyfError('Username must be 1-30 characters', 2500);
 		};
 
 		if (roomId.length > 150) {
-			return notyfError('The max length for RoomId is 150 characters');
+			return notyfError('The max length for RoomId is 150 characters', 2500);
 		};
 		
 		socket.emit(CHECK_IF_ROOM_IS_FULL, roomId, (result) => {
