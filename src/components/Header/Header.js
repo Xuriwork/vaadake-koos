@@ -25,7 +25,7 @@ const Header = ({ roomName }) => {
 	
 	const updateClipboard = (textToCopy) => {
 		navigator.clipboard.writeText(textToCopy).then(() => {
-			notyfSuccess('Copied room link 📋', 2500);
+			notyfSuccess('Copied invite link 📋', 2500);
 		}, () => notyfError('Failed to copy invite link 🙁', 3000));
 	};
 
