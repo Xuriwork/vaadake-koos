@@ -10,10 +10,6 @@ const InvitedPage = ({ socket }) => {
 
     useEffect(() => {
         socket.emit(GET_SHORT_URL, inviteCode, (result, shortURLCode) => {
-            
-            console.log(result);
-            console.log(shortURLCode);
-
             if (result) {
                 history.push('/join', { roomName: shortURLCode });
             } else if (!result) {
