@@ -6,11 +6,17 @@ You can view the live app at [Vaadake Koos](https://vaadakekoos.web.app).
 
 ## Available Scripts
 
+### Install the dependencies
+
+```
+yarn install
+```
+
+### Runs the app in the development mode and starts up the local server.
+
 ```
 yarn dev
 ```
-
-Runs the app in the development mode and starts up the local server.
 
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
