@@ -3,12 +3,14 @@ const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const bcrypt = require('bcrypt');
+const shortid = require('shortid');
 
 const { addUser, removeUser, getUser, getAllUsersInRoom } = require('./actions/userActions');
-const { addRoom, removeRoom, getRoom } = require('./actions/roomActions');
+const { addRoom, removeRoom, getRoomByName, getRoomByShortURLCode } = require('./actions/roomActions');
 
 const {
   CHECK_IF_ROOM_REQUIRES_PASSCODE,
+  GET_INVITE_CODE,
   REQUIRES_PASSCODE,
   VERIFY_PASSCODE,
   SET_ROOM_PASSCODE,
@@ -31,7 +33,8 @@ const {
   REMOVE_FROM_PLAYLIST,
   GET_USERS,
   SET_MAX_ROOM_SIZE,
-  CHECK_IF_ROOM_IS_FULL
+  CHECK_IF_ROOM_IS_FULL,
+  GET_SHORT_URL
 } = require('../SocketActions');
 
 const PORT = process.env.PORT || 5000;
@@ -48,8 +51,8 @@ io.on('connection', (socket) => {
     socket.emit(NOTIFY_CLIENT_SUCCESS, message);
   };
 
-  socket.on(CHECK_IF_ROOM_IS_FULL, (roomId, callback) => {
-    const room = getRoom(roomId);
+  socket.on(CHECK_IF_ROOM_IS_FULL, (roomName, callback) => {
+    const room = getRoomByName(roomName);
 
     if (room && room.numberOfUsers === room.maxRoomSize) {
       return callback('ROOM_IS_FULL', true);
@@ -58,8 +61,8 @@ io.on('connection', (socket) => {
     callback(null, false);
   });
 
-  socket.on(CHECK_IF_ROOM_REQUIRES_PASSCODE, (roomId, callback) => {
-    const room = getRoom(roomId);
+  socket.on(CHECK_IF_ROOM_REQUIRES_PASSCODE, (roomName, callback) => {
+    const room = getRoomByName(roomName);
     
     if (room && room.passcode) {
       return callback(REQUIRES_PASSCODE, true);
@@ -68,8 +71,8 @@ io.on('connection', (socket) => {
     callback(null, false);
   });
 
-  socket.on(VERIFY_PASSCODE, ({ roomId, passcode }, callback) => {
-    const room = getRoom(roomId);
+  socket.on(VERIFY_PASSCODE, ({ roomName, passcode }, callback) => {
+    const room = getRoomByName(roomName);
 
     bcrypt.compare(passcode, room.passcode)
     .then((result) => {
@@ -78,39 +81,52 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on(JOIN, ({ username, roomId }) => {
-    const room = getRoom(roomId);
+  socket.on(GET_SHORT_URL, (shortURLCode, callback) => {
+    const room = getRoomByShortURLCode(shortURLCode);
 
-    const { user } = addUser({ id: socket.id, username, roomId });
+    if (room && room.name) return callback(true, room.name);
+    callback(false, null);
+  });
+
+  socket.on(JOIN, ({ username, roomName }) => {
+    const room = getRoomByName(roomName);
+
+    const { user } = addUser({ id: socket.id, username, roomName });
 
     socket.leaveAll();
-    socket.join(user.roomId);
-    socket.roomId = user.roomId;
+    socket.join(user.roomName);
+    socket.roomName = user.roomName;
     
-    io.in(user.roomId).emit(MESSAGE, {
+    io.in(user.roomName).emit(MESSAGE, {
       type: 'SERVER_USER-JOINED',
       content: `${user.username} joined the room. 👋`
     });
     
-    socket.to(user.roomId).emit(NEW_USER_JOINED);
+    socket.to(user.roomName).emit(NEW_USER_JOINED);
     
-    const users = getAllUsersInRoom(user.roomId);
-    
-    if (!room) addRoom({ id: user.roomId, users });
-    const { host } = getRoom(socket.roomId);
+    const users = getAllUsersInRoom(user.roomName);
+    if (!room) addRoom({ name: user.roomName, host: users[0].id, shortURLCode: shortid.generate() });
 
-    io.in(user.roomId).emit(SET_HOST, host);
-    io.in(user.roomId).emit(GET_USERS, users);
+    const { host } = getRoomByName(user.roomName);
+
+    io.in(user.roomName).emit(SET_HOST, host);
+    io.in(user.roomName).emit(GET_USERS, users);
+  });
+
+  socket.on(GET_INVITE_CODE, () => {
+    const room = getRoomByName(socket.roomName);
+    socket.emit(GET_INVITE_CODE, room.shortURLCode);
+    console.log(room.shortURLCode);
   });
 
   socket.on(SET_NEW_HOST, (newHost) => {
     const user = getUser(newHost);
-    const room = getRoom(socket.roomId);
+    const room = getRoomByName(socket.roomName);
 
     if (socket.id === room.host) {
       room.host = newHost;
-      io.in(user.roomId).emit(SET_HOST, room.host);
-      io.in(user.roomId).emit(MESSAGE, {
+      io.in(user.roomName).emit(SET_HOST, room.host);
+      io.in(user.roomName).emit(MESSAGE, {
         type: 'NEW_HOST',
         content: `${user.username} is now the host. 👑`
       });
@@ -118,78 +134,78 @@ io.on('connection', (socket) => {
   });
 
   socket.on(PLAY, () => {
-    //const room = getRoom(socket.roomId);
+    //const room = getRoomByName(socket.roomName);
 
     //if (socket.id !== room.host) return;
     
     const user = getUser(socket.id);
-    socket.to(user.roomId).emit(PLAY);
+    socket.to(user.roomName).emit(PLAY);
   });
 
   socket.on(PAUSE, () => {
-    //const room = getRoom(socket.roomId);
+    //const room = getRoomByName(socket.roomName);
 
     //if (socket.id !== room.host) return;
 
     const user = getUser(socket.id);
-    socket.to(user.roomId).emit(PAUSE);    
+    socket.to(user.roomName).emit(PAUSE);    
   });
 
   socket.on(SYNC_TIME, (currentTime) => {
     const user = getUser(socket.id);
-    socket.to(user.roomId).emit(SYNC_TIME, currentTime);
+    socket.to(user.roomName).emit(SYNC_TIME, currentTime);
   });
 
   socket.on(NEW_VIDEO, (videoURL) => {
 
-    const room = getRoom(socket.roomId);
+    const room = getRoomByName(socket.roomName);
 
     if (socket.id !== room.host) {
       return sendClientUnsuccessNotification('Only the host can change videos 😉');
     };
 
     const user = getUser(socket.id);
-    io.to(user.roomId).emit(NEW_VIDEO, videoURL);
+    io.to(user.roomName).emit(NEW_VIDEO, videoURL);
   });
 
   socket.on(GET_VIDEO_INFORMATION, () => {
     const user = getUser(socket.id);
-    socket.to(user.roomId).emit(GET_VIDEO_INFORMATION);
+    socket.to(user.roomName).emit(GET_VIDEO_INFORMATION);
   });
 
   socket.on(SYNC_VIDEO_INFORMATION, (data) => {
     const user = getUser(socket.id);
-    io.to(user.roomId).emit(SYNC_VIDEO_INFORMATION, data);
+    io.to(user.roomName).emit(SYNC_VIDEO_INFORMATION, data);
   });
 
   socket.on(GET_PLAYLIST, () => {
-    const room = getRoom(socket.roomId);
+    const room = getRoomByName(socket.roomName);
     socket.emit(GET_PLAYLIST, room.playlist);
   });
 
   socket.on(ADD_TO_PLAYLIST, (data) => {
-    const room = getRoom(socket.roomId);
+    const room = getRoomByName(socket.roomName);
 
     const videoExist = room.playlist.find((video) => video.id === data.id);
     if (!!videoExist) return;
 
     room.playlist.push(data);
-    io.to(socket.roomId).emit(GET_PLAYLIST, room.playlist);
+    io.to(socket.roomName).emit(GET_PLAYLIST, room.playlist);
   });
 
   socket.on(REMOVE_FROM_PLAYLIST, (data) => {
-    const room = getRoom(socket.roomId);
+    const room = getRoomByName(socket.roomName);
     const playlist = room.playlist;
 
     const index = playlist.findIndex((video) => video.id === data);
     if (index !== -1) playlist.splice(index, 1);
 
-    io.to(socket.roomId).emit(GET_PLAYLIST, playlist);
+    io.to(socket.roomName).emit(GET_PLAYLIST, playlist);
   });
 
   socket.on(SEND_MESSAGE, (data) => {
     const user = getUser(socket.id);
-    io.in(user.roomId).emit(MESSAGE, { 
+    io.in(user.roomName).emit(MESSAGE, { 
       username: user.username, 
       content: data.content, 
       id: socket.id 
@@ -197,7 +213,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on(SET_ROOM_PASSCODE, (passcode) => {
-    const room = getRoom(socket.roomId);
+    const room = getRoomByName(socket.roomName);
     if (socket.id !== room.host) return;
 
     if (passcode.length > 50) {
@@ -210,7 +226,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on(SET_MAX_ROOM_SIZE, (newMaxRoomSize) => {
-    const room = getRoom(socket.roomId);
+    const room = getRoomByName(socket.roomName);
     if (socket.id !== room.host) return;
 
     if (newMaxRoomSize > 20) {
@@ -228,29 +244,29 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
       const user = removeUser(socket.id);
       if (user) {
-        const room = getRoom(socket.roomId);
+        const room = getRoomByName(socket.roomName);
 
 				const userWasAdmin = socket.id === room.host;
-				const users = getAllUsersInRoom(user.roomId);
+				const users = getAllUsersInRoom(user.roomName);
 
 				if (userWasAdmin && users.length > 0) {
 					room.host = users[0].id;
 
-					io.in(user.roomId).emit(SET_HOST, room.host);
-					io.in(user.roomId).emit(MESSAGE, {
+					io.in(user.roomName).emit(SET_HOST, room.host);
+					io.in(user.roomName).emit(MESSAGE, {
 						type: 'NEW_HOST',
 						content: `${users[0].username} is now the host. 👑`,
 					});
 				} else if (users.length === 0) {
-					removeRoom(socket.roomId);
+					removeRoom(socket.roomName);
 				}
 
-				io.in(user.roomId).emit(MESSAGE, {
+				io.in(user.roomName).emit(MESSAGE, {
 					type: 'SERVER_USER-LEFT',
 					content: `${user.username} has left the room.`,
 				});
 
-				io.in(user.roomId).emit(GET_USERS, users);
+				io.in(user.roomName).emit(GET_USERS, users);
       };
     });
 });

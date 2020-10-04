@@ -7,6 +7,7 @@ import { notyfError, notyfSuccess } from '../utils/notyf';
 
 import {
 	PLAY,
+	GET_INVITE_CODE,
 	JOIN,
 	PAUSE,
 	SYNC_TIME,
@@ -73,19 +74,22 @@ export class VideoRoom extends Component {
 	};
 
 	onSocketMethods = (socket) => {
-		const { roomId, username } = this.props;
+		const { roomName, username, history } = this.props;
 		const { player } = this.state;
 		
 		socket.on('connect', () => {
-			socket.emit(JOIN, { roomId, username });
+			socket.emit(JOIN, { roomName, username });
 			socket.emit(GET_VIDEO_INFORMATION);
 			socket.emit(GET_PLAYLIST);
+			socket.emit(GET_INVITE_CODE);
 		});
 
 		socket.on('error', (error) => console.error(error));
 
 		socket.on(NOTIFY_CLIENT_ERROR, (message) => notyfError(message, 5000));
 		socket.on(NOTIFY_CLIENT_SUCCESS, (message) => notyfSuccess(message, 5000));
+
+		socket.on(GET_INVITE_CODE, (inviteCode) => history.replace('/', { inviteCode }));
 
 		socket.on(NEW_USER_JOINED, () => this.context.playUserJoinedSound());
 

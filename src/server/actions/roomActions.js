@@ -1,14 +1,13 @@
 const rooms = [];
 
-const addRoom = ({ host, id, users }) => {
+const addRoom = ({ host, name, shortURLCode }) => {
 
-    id = id.trim();
+    name = name.trim();
 
-    if (!host) host = users[0].id;
-    const room = { host, id, numberOfUsers: users.length, playlist: [], maxRoomSize: 20 };
+    const room = { host, name, shortURLCode, playlist: [], maxRoomSize: 20 };
     rooms.push(room);
 
-    return { room };
+    return room;
 };
 
 const removeRoom = (id) => {
@@ -16,6 +15,7 @@ const removeRoom = (id) => {
     if (index !== -1) return rooms.splice(index, 1)[0];
 };
 
-const getRoom = (roomId) => rooms.filter((room) => room.id === roomId)[0];
+const getRoomByName = (roomName) => rooms.filter((room) => room.name === roomName)[0];
+const getRoomByShortURLCode = (shortURLCode) => rooms.filter((room) => room.shortURLCode === shortURLCode)[0];
 
-module.exports = { addRoom, getRoom, removeRoom };
+module.exports = { addRoom, getRoomByName, removeRoom, getRoomByShortURLCode };

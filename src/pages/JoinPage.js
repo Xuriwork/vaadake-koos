@@ -1,40 +1,40 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import shortid from 'shortid';
-import queryString from 'query-string';
 import { CHECK_IF_ROOM_REQUIRES_PASSCODE, CHECK_IF_ROOM_IS_FULL } from '../SocketActions';
 import { notyfError } from '../utils/notyf';
 
 const JoinPage = ({ socket, handleSetCredentials, setAuthorized }) => {
     const history = useHistory();
-    const location = useLocation();
+	const location = useLocation();
     const [username, setUsername] = useState('');
-    const [roomId, setRoomId] = useState('');
-    const [hideRoomIdInput, setHideRoomIdInput] = useState(false);
+    const [roomName, setRoomName] = useState('');
+    const [hideRoomNameInput, setHideRoomNameInput] = useState(false);
 
     useEffect(() => {
-        const getRoomId = () => {
-            const { roomId } = queryString.parse(location.search);
-            return roomId ?? null;
+        const getRoomName = () => {
+			if (!location.state) return null;
+			else if (location.state.roomName) {
+				return location.state.roomName;
+			};
         };
 
-        const _roomId = getRoomId();
+        const roomName = getRoomName();
 
-        if (_roomId) {
-            setRoomId(_roomId);
-            setHideRoomIdInput(true);
-        };
+        if (roomName) {
+            setRoomName(roomName);
+            setHideRoomNameInput(true);
+		};
+    }, [location.state]);
 
-    }, [location.search]);
-
-    const handleOnChangeRoomId = (e) => setRoomId(e.target.value);
+    const handleOnChangeRoomName = (e) => setRoomName(e.target.value);
     const handleOnChangeUsername = (e) => setUsername(e.target.value);
 
-    const handleGenerateRandomRoomId = (e) => setRoomId(createRandomRoomId(e));
+    const handleGenerateRandomRoomName = (e) => setRoomName(createRandomRoomName(e));
 
     const preventDefault = (e) => e.keyCode === 13 && e.preventDefault();
 
-	const createRandomRoomId = (e) => {
+	const createRandomRoomName = (e) => {
         e.preventDefault();
         const randomId = shortid.generate() + shortid.generate();
 		return randomId;
@@ -43,27 +43,27 @@ const JoinPage = ({ socket, handleSetCredentials, setAuthorized }) => {
     const joinRoom = (e) => {
         e.preventDefault();
         
-		if (username.trim() === '' || roomId.trim() === '') return;
+		if (username.trim() === '' || roomName.trim() === '') return;
 		
         if (!/^[a-zA-Z0-9_-]{1,30}$/.test(username)) {
 			return notyfError('Username must be 1-30 characters', 2500);
 		};
 
-		if (roomId.length > 150) {
-			return notyfError('The max length for RoomId is 150 characters', 2500);
+		if (roomName.length > 150) {
+			return notyfError('The max length for room name is 150 characters', 2500);
 		};
 		
-		socket.emit(CHECK_IF_ROOM_IS_FULL, roomId, (result) => {
+		socket.emit(CHECK_IF_ROOM_IS_FULL, roomName, (result) => {
 
 			if (result === 'ROOM_IS_FULL') {
 				return notyfError('Sorry, this room is full', 2500);
 			};
 
-			socket.emit(CHECK_IF_ROOM_REQUIRES_PASSCODE, roomId, (result) => {
+			socket.emit(CHECK_IF_ROOM_REQUIRES_PASSCODE, roomName, (result) => {
 				if (result === 'REQUIRES_PASSCODE') {
-					return history.push('/enter-passcode', { username, roomId });
+					return history.push('/enter-passcode', { username, roomName });
 				} else if (!result) {
-					handleSetCredentials(username, roomId);
+					handleSetCredentials(username, roomName);
 					setAuthorized(true);
 					history.push('/');
 				};
@@ -75,21 +75,21 @@ const JoinPage = ({ socket, handleSetCredentials, setAuthorized }) => {
 			<div className='join-page'>
 				<div className='join-form-container'>
 					<form>
-						{!hideRoomIdInput && (
+						{!hideRoomNameInput && (
 							<>
-								<label htmlFor='roomId'>Room Id</label>
+								<label htmlFor='roomName'>Room Name</label>
 								<input
 									type='text'
-									name='roomId'
-									id='roomId'
-									value={roomId}
-									onChange={handleOnChangeRoomId}
+									name='roomName'
+									id='roomName'
+									value={roomName}
+									onChange={handleOnChangeRoomName}
 								/>
 								<button
-									className='generate-random-roomId-button'
-									onClick={handleGenerateRandomRoomId}
+									className='generate-random-roomName-button'
+									onClick={handleGenerateRandomRoomName}
 								>
-									Generate Random Room Id
+									Generate Random Room Name
 								</button>
 							</>
 						)}

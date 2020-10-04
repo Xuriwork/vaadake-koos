@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { notyfError, notyfSuccess } from '../../utils/notyf';
 
 import Logo from '../../assets/images/vaadake_koos_logo.svg';
@@ -7,16 +7,17 @@ import InviteUserIcon from '../../assets/icons/user-add-fill.svg';
 
 import Dropdown from './Dropdown/Dropdown';
 
-const Header = ({ roomId }) => {
-	const roomIdInputRef = useRef(null);
+const Header = ({ roomName }) => {
+	const roomNameInputRef = useRef(null);
 	const dropdownButtonRef = useRef(null);
 	const [dropdownOpen, setDropdownOpen] = useState(false);
+	const location = useLocation();
     
 	const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 	const closeDropdown = () => setTimeout(() => setDropdownOpen(false), 250);
 
 	const copyToClipboard = (e) => {
-		roomIdInputRef.current.select();
+		roomNameInputRef.current.select();
 		document.execCommand('copy');
 		e.target.focus();
 		notyfSuccess('Copied to clipboard 📋', 2500);
@@ -28,27 +29,27 @@ const Header = ({ roomId }) => {
 		}, () => notyfError('Failed to copy invite link 🙁', 3000));
 	};
 
-	const handleCreateInviteCode = () => {
-		const encodedRoomId = encodeURIComponent(roomId)
-		const inviteLink = `${window.location.href}join?roomId=${encodedRoomId}`;
+	const handleGetInviteCode = () => {
+		const inviteCode = location.state.inviteCode;
+		const inviteLink = `${window.location.href}invite/${inviteCode}`;
 		updateClipboard(inviteLink);
 	};
 
 	return (
 		<header className='header'>
-			<Link to='/join'>
+			<Link to='/'>
 				<img src={Logo} alt='logo' className='logo' />
 			</Link>
-			{roomId && (
-				<div className='roomId-code-container'>
+			{roomName && (
+				<div className='roomName-code-container'>
 					<input
-						ref={roomIdInputRef}
-						defaultValue={roomId}
+						ref={roomNameInputRef}
+						defaultValue={roomName}
 						readOnly={true}
-						className='roomId-code-input'
+						className='roomName-code-input'
 						onClick={copyToClipboard}
 					/>
-					<button onClick={handleCreateInviteCode}>
+					<button onClick={handleGetInviteCode}>
 						<img src={InviteUserIcon} alt='Get invite link' />
 					</button>
 				</div>

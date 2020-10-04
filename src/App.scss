@@ -120,11 +120,7 @@
 	font-weight: 600;
 
 	&:disabled {
-		background-image: linear-gradient(
-			180deg,
-			#5e5e5e 0%,
-			#585858 120%
-		);
+		background-image: linear-gradient(180deg, #5e5e5e 0%, #585858 120%);
 	}
 }
 
@@ -299,7 +295,7 @@ input {
 		}
 	}
 
-	.roomId-code-container {
+	.roomName-code-container {
 		@extend %flex-complete-center-row;
 		margin-left: auto;
 		margin-right: 10px;
@@ -390,6 +386,10 @@ input {
 		margin-bottom: 35px;
 		font-size: 1.3em;
 		text-align: center;
+
+		span {
+			margin-left: 5px;
+		}
 	}
 
 	.loading-balls {
@@ -423,6 +423,67 @@ input {
 		}
 		to {
 			transform: translateY(100%);
+		}
+	}
+}
+.redirecting-screen {
+	@extend %flex-complete-center-column;
+	height: 100%;
+	width: 100%;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 3;
+	background-image: var(--background);
+	background-color: var(--background-fallback);
+	color: #ffffff;
+
+	h1 {
+		font-size: 1.8em;
+		margin-bottom: 10px;
+	}
+
+	.dots-container {
+		width: 3em;
+		height: 3em;
+		display: grid;
+		grid-template-rows: repeat(3, 1fr);
+		grid-template-columns: repeat(3, 1fr);
+		justify-items: center;
+		align-items: center;
+
+		> div {
+			width: 0.5em;
+			height: 0.5em;
+			background-color: #ffffff;
+			border-radius: 50%;
+			animation: fade 1.5s alternate ease-in-out infinite;
+
+			&:nth-of-type(2),
+			&:nth-of-type(4) {
+				animation-delay: 0.25s;
+			}
+
+			&:nth-of-type(3),
+			&:nth-of-type(5),
+			&:nth-of-type(7) {
+				animation-delay: 0.5s;
+			}
+
+			&:nth-of-type(6),
+			&:nth-of-type(8) {
+				animation-delay: 0.75s;
+			}
+
+			&:nth-of-type(9) {
+				animation-delay: 1s;
+			}
+
+			@keyframes fade {
+				to {
+					opacity: 0.2;
+				}
+			}
 		}
 	}
 }
@@ -557,7 +618,7 @@ input {
 				}
 			}
 
-			.generate-random-roomId-button {
+			.generate-random-roomName-button {
 				padding: 8px;
 				background-color: transparent;
 				color: #ec3160;
@@ -692,7 +753,6 @@ input {
 		padding: 5px;
 		color: var(--text);
 		box-sizing: border-box;
-		
 
 		&:not(:first-of-type) {
 			&:hover {
@@ -751,7 +811,7 @@ input {
 		display: flex;
 		flex-direction: column;
 	}
-	
+
 	.messages-container {
 		flex-grow: 1;
 		border-radius: 5px;
@@ -1014,7 +1074,7 @@ input {
 				background-color: transparent;
 				line-height: 20px;
 			}
-			
+
 			button:not(.close-button) {
 				padding: 5px 15px;
 				color: #ffffff;
@@ -1039,7 +1099,6 @@ input {
 	}
 
 	.chat-tab {
-		
 		.messages-and-input-container {
 			width: 100%;
 			max-width: 100%;
@@ -1058,7 +1117,8 @@ input {
 		max-height: 40vh;
 	}
 
-	.playlist-tab, .room-settings-tab {
+	.playlist-tab,
+	.room-settings-tab {
 		position: fixed;
 		bottom: 0;
 		right: 0;
@@ -1084,7 +1144,6 @@ input {
 		height: 100%;
 		border-radius: 0;
 	}
-
 }
 
 @media (max-width: 600px) {
@@ -1118,7 +1177,7 @@ input {
 }
 
 @media (max-width: 400px) {
-	.roomId-code-input {
+	.roomName-code-input {
 		display: none;
 	}
 }
