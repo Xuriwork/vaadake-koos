@@ -3,7 +3,7 @@ import { SET_MAX_ROOM_SIZE, SET_ROOM_PASSCODE } from '../../../../SocketActions'
 import Modal from './UserActionsModal';
 import { SheildIcon } from './SheildIcon';
 
-const RoomSettings = ({ socket, host, users, handleSetNewHost, handleKickUser }) => {
+const RoomSettings = ({ socket, host, users, handleSetNewHost }) => {
     const [roomPasscode, setRoomPasscode] = useState('');
 	const [maxRoomSize, setMaxRoomSize] = useState(20);
 	const [userActionModal, setUserActionModal] = useState(null);
@@ -37,7 +37,6 @@ const RoomSettings = ({ socket, host, users, handleSetNewHost, handleKickUser })
 				<Modal
 					userId={userActionModal}
 					handleSetNewHost={handleSetNewHost}
-					handleKickUser={handleKickUser}
 					handleCloseModal={handleCloseModal}
 				/>
 			)}
