@@ -116,7 +116,6 @@ io.on('connection', (socket) => {
   socket.on(GET_INVITE_CODE, () => {
     const room = getRoomByName(socket.roomName);
     socket.emit(GET_INVITE_CODE, room.shortURLCode);
-    console.log(room.shortURLCode);
   });
 
   socket.on(SET_NEW_HOST, (newHost) => {

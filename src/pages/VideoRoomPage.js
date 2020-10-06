@@ -33,7 +33,7 @@ import Tabs from '../components/VideoRoom/Tabs/Tabs';
 import CurrentTab from '../components/VideoRoom/CurrentTab';
 
 const socketURL = process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : process.env.REACT_APP_GAE_API_URL;
-const URL_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)/;
+const YOUTUBE_VIDEO_URL_REGEX = /^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/|\/embed\/.+$/;
 
 const youtubeConfig = {
 	height: '390',
@@ -164,13 +164,14 @@ export class VideoRoom extends Component {
 
 	handleOnChangeVideoURL = (e) => this.setState({ videoURL: e.target.value });
 
-	handleChangeVideo = (videoId) => {
-		if (videoId) {
-			return this.state.socket.emit(NEW_VIDEO, videoId);
-		} else if (!URL_REGEX.test(this.state.videoURL)) {
+	handleChangeVideo = () => {
+		const { videoURL, socket } = this.state;
+
+		if (!YOUTUBE_VIDEO_URL_REGEX.test(videoURL)) {
 			return notyfError('Invalid URL', 5000);
 		};
-		this.state.socket.emit(NEW_VIDEO, this.state.videoURL);
+		
+		socket.emit(NEW_VIDEO, videoURL);
 	};
 
 	handleOnKeyDown = (e) => {
