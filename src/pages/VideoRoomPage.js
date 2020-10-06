@@ -141,7 +141,7 @@ export class VideoRoom extends Component {
 	};
 
 	onReady = (e) => {
-		const socket = io(socketURL);
+		const socket = io(socketURL, {transports: ['websocket']});
 		this.setState({ player: e.target, socket });
 		this.onSocketMethods(socket);
 		this.setState({ loading: false });

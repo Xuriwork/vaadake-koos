@@ -15,7 +15,7 @@ import InvitedPage from './pages/InvitedPage';
 const socketURL = process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : process.env.REACT_APP_GAE_API_URL;
 
 const App = () => {
-	const socket = io(socketURL);
+	const socket = io(socketURL, {transports: ['websocket']});
 	const [info, setInfo] = useState({});
 	const [authorized, setAuthorized] = useState(false);
 
