@@ -11,9 +11,12 @@ import {
 	JOIN,
 	PAUSE,
 	SYNC_TIME,
-	NEW_VIDEO,
+	SYNC_WITH_HOST,
+	GET_HOST_TIME,
 	GET_VIDEO_INFORMATION,
 	SYNC_VIDEO_INFORMATION,
+	SYNC_VIDEO_WITH_HOST,
+	VIDEO_CHANGED,
 	SEND_MESSAGE,
 	MESSAGE,
 	GET_USERS,
@@ -22,9 +25,9 @@ import {
 	SET_NEW_HOST,
 	NOTIFY_CLIENT_SUCCESS,
 	NOTIFY_CLIENT_ERROR,
-	GET_PLAYLIST,
-	ADD_TO_PLAYLIST,
-	REMOVE_FROM_PLAYLIST
+	GET_QUEUE,
+	ADD_TO_QUEUE,
+	REMOVE_FROM_QUEUE
 } from '../SocketActions';
 
 import { SettingsContext } from '../context/SettingsContext';
@@ -58,7 +61,7 @@ export class VideoRoom extends Component {
 		videoURL: '',
 		loading: true,
 		tab: 'chat',
-		playlist: [],
+		queue: [],
 	};
 
 	componentDidMount() {
@@ -80,7 +83,7 @@ export class VideoRoom extends Component {
 		socket.on('connect', () => {
 			socket.emit(JOIN, { roomName, username });
 			socket.emit(GET_VIDEO_INFORMATION);
-			socket.emit(GET_PLAYLIST);
+			socket.emit(GET_QUEUE);
 			socket.emit(GET_INVITE_CODE);
 		});
 
@@ -97,19 +100,26 @@ export class VideoRoom extends Component {
 
 		socket.on(PAUSE, () => player.pauseVideo());
 
+		socket.on(GET_HOST_TIME, () => socket.emit(SYNC_WITH_HOST));
+
+		socket.on(SYNC_VIDEO_WITH_HOST, () => {
+			socket.emit(SYNC_TIME, player.getCurrentTime());
+		});
+
 		socket.on(SYNC_TIME, (currentTime) => this.syncTime(currentTime));
 
-		socket.on(NEW_VIDEO, (videoURL) => {
+		socket.on(VIDEO_CHANGED, (videoURL) => {
 			player.loadVideoById({
 				videoId: this.convertURLToYoutubeVideoId(videoURL)
 			});
+			socket.emit(SYNC_VIDEO_WITH_HOST);
 		});
 
 		socket.on(GET_VIDEO_INFORMATION, () => {
 			const data = {
 				videoURL: player.getVideoUrl(),
 				currentTime: player.getCurrentTime()
-			}
+			};
 			socket.emit(SYNC_VIDEO_INFORMATION, data);
 		});
 
@@ -127,7 +137,7 @@ export class VideoRoom extends Component {
 
 		socket.on(SET_HOST, (host) => this.setState({ host }));
 
-		socket.on(GET_PLAYLIST, (playlist) => this.setState({ playlist }));
+		socket.on(GET_QUEUE, (queue) => this.setState({ queue }));
 	};
 
 	onReady = (e) => {
@@ -171,7 +181,7 @@ export class VideoRoom extends Component {
 			return notyfError('Invalid URL', 5000);
 		};
 		
-		socket.emit(NEW_VIDEO, videoURL);
+		socket.emit(VIDEO_CHANGED, videoURL);
 	};
 
 	handleOnKeyDown = (e) => {
@@ -192,10 +202,10 @@ export class VideoRoom extends Component {
 		});
 	};
 
-	addToPlaylist = (video) => this.state.socket.emit(ADD_TO_PLAYLIST, video);
+	addToQueue = (video) => this.state.socket.emit(ADD_TO_QUEUE, video);
 
-	removeFromPlaylist = (videoId) => {
-		this.state.socket.emit(REMOVE_FROM_PLAYLIST, videoId)
+	removeFromQueue = (videoId) => {
+		this.state.socket.emit(REMOVE_FROM_QUEUE, videoId)
 	};
 
 	sendMessage = (message) => {
@@ -217,14 +227,14 @@ export class VideoRoom extends Component {
 		  case 0:
 			break;
 		  case 1:
-			socket.emit(SYNC_TIME, player.getCurrentTime());
+			socket.emit(SYNC_WITH_HOST);
 			socket.emit(PLAY);
 			break;
 		  case 2:
 			socket.emit(PAUSE);
 			break;
 		  case 3:
-			socket.emit(SYNC_TIME, player.getCurrentTime());
+			socket.emit(SYNC_WITH_HOST);
 			break;
 		  case 5:
 			break;
@@ -237,7 +247,7 @@ export class VideoRoom extends Component {
 	
 	render() {	
 		
-		const { loading, messages, users, socket, host, tab, playlist, videoURL } = this.state;
+		const { loading, messages, users, socket, host, tab, queue, videoURL } = this.state;
 
 		return (
 			<>
@@ -279,9 +289,9 @@ export class VideoRoom extends Component {
 								sendMessage={this.sendMessage}
 								host={host}
 								handleSetNewHost={this.handleSetNewHost}
-								playlist={playlist}
-								removeFromPlaylist={this.removeFromPlaylist}
-								addToPlaylist={this.addToPlaylist}
+								queue={queue}
+								removeFromQueue={this.removeFromQueue}
+								addToQueue={this.addToQueue}
 								handleChangeVideo={this.handleChangeVideo}
 							/>
 							)}

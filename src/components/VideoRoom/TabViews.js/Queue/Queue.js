@@ -1,12 +1,12 @@
 /* eslint-disable no-useless-escape */
 import React, { useState } from 'react';
 import { notyfError } from '../../../../utils/notyf';
-import { TrashIcon, PlayVideoIcon } from './PlaylistIcons';
+import { TrashIcon, PlayVideoIcon } from './QueueIcons';
 
 const YOUTUBE_API_KEY = process.env.REACT_APP_YOUTUBE_API_KEY;
 const URL_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)/;
 
-const Playlist = ({ playlist, addToPlaylist, removeFromPlaylist, handleChangeVideo, setTab }) => {
+const Queue = ({ queue, addToQueue, removeFromQueue, handleChangeVideo, setTab }) => {
 	const [videoURL, setVideoURL] = useState('');
 
 	const convertURLToYoutubeVideoId = (url) => {
@@ -20,7 +20,7 @@ const Playlist = ({ playlist, addToPlaylist, removeFromPlaylist, handleChangeVid
 		return id;
 	};
 
-    const handleAddVideoToPlaylist = () => {
+    const handleAddVideoToQueue = () => {
 		if (videoURL.trim() === '') return;
 		if (!URL_REGEX.test(videoURL)) {
 			return notyfError('Invalid URL', 2500);
@@ -37,47 +37,47 @@ const Playlist = ({ playlist, addToPlaylist, removeFromPlaylist, handleChangeVid
 			const thumbnail = items[0].snippet.thumbnails.medium.url;
 			const title = items[0].snippet.title;
 
-			const playlistItem = { id, thumbnail, title };
+			const queueItem = { id, thumbnail, title };
 
-			addToPlaylist(playlistItem);
+			addToQueue(queueItem);
 			setVideoURL('');
 		})
 		.catch((error) => console.error(error));
     };
 
-    const removeVideoFromPlaylist = (videoId) => removeFromPlaylist(videoId);
+    const removeVideoFromQueue = (videoId) => removeFromQueue(videoId);
 
 	const playVideo = async (videoId) => {
 		await handleChangeVideo(videoId);
-		removeVideoFromPlaylist(videoId);
+		removeVideoFromQueue(videoId);
 	};
 	
 	const handleOnKeyDown = (e) => {
-    	if (e.keyCode === 13) handleAddVideoToPlaylist(e);
+    	if (e.keyCode === 13) handleAddVideoToQueue(e);
 	};
 
 	const handleOnChange = (e) => setVideoURL(e.target.value);
 
     return (
 			<>
-				<h2>Playlist</h2>
-				<div className='add-to-playlist-input-container'>
+				<h2>Queue</h2>
+				<div className='add-to-queue-input-container'>
 					<input
 						type='text'
-						placeholder='Add video to playlist'
+						placeholder='Add video to queue'
 						pattern='https://.*'
 						onChange={handleOnChange}
 						value={videoURL}
 						onKeyDown={handleOnKeyDown}
 					/>
-					<button onClick={handleAddVideoToPlaylist}>Add Video</button>
+					<button onClick={handleAddVideoToQueue}>Add Video</button>
 				</div>
-				<ul className='video-playlist'>
-					{playlist.map((video) => (
+				<ul className='video-queue'>
+					{queue.map((video) => (
 						<li key={video.id}>
 							<img src={video.thumbnail} alt={video.title} />
 							<span>
-								<button onClick={() => removeVideoFromPlaylist(video.id)}>
+								<button onClick={() => removeVideoFromQueue(video.id)}>
 									<TrashIcon />
 								</button>
 								<button onClick={() => playVideo(video.id)}>
@@ -92,4 +92,4 @@ const Playlist = ({ playlist, addToPlaylist, removeFromPlaylist, handleChangeVid
 		);
 }
 
-export default Playlist;
+export default Queue;

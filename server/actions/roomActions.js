@@ -4,7 +4,7 @@ const addRoom = ({ host, name, shortURLCode }) => {
 
     name = name.trim();
 
-    const room = { host, name, shortURLCode, playlist: [], maxRoomSize: 20 };
+    const room = { host, name, shortURLCode, queue: [], maxRoomSize: 20 };
     rooms.push(room);
 
     return room;

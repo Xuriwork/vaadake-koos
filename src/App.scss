@@ -609,13 +609,17 @@ input {
 				padding: 0 10px;
 				border-bottom: 2px solid transparent;
 
-				&:not(:last-of-type) {
-					margin-bottom: 10px;
+				&.has-error {
+					border-bottom: 2px solid #ff3838;
 				}
 
 				&:focus {
 					border-bottom: 2px solid var(--theme-color-secondary);
 				}
+			}
+
+			button {
+				margin-top: 10px;
 			}
 
 			.generate-random-roomName-button {
@@ -633,11 +637,14 @@ input {
 			}
 
 			.join-button {
-				margin-top: 15px;
 				padding: 10px;
 				background-image: var(--gradient-button);
 				color: #ffffff;
 				font-size: 0.95em;
+			}
+
+			.error-message {
+				color: #ff3838;
 			}
 		}
 	}
@@ -926,12 +933,12 @@ input {
 	}
 }
 
-.playlist-tab {
+.queue-tab {
 	padding-right: 20px;
 	box-sizing: border-box;
 }
 
-.add-to-playlist-input-container {
+.add-to-queue-input-container {
 	width: 100%;
 
 	input {
@@ -948,7 +955,7 @@ input {
 	}
 }
 
-.video-playlist {
+.video-queue {
 	border-radius: 5px;
 	overflow-y: auto;
 	background-color: var(--tab-content-background);
@@ -1117,7 +1124,7 @@ input {
 		max-height: 40vh;
 	}
 
-	.playlist-tab,
+	.queue-tab,
 	.room-settings-tab {
 		position: fixed;
 		bottom: 0;
