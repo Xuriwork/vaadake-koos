@@ -609,13 +609,17 @@ input {
 				padding: 0 10px;
 				border-bottom: 2px solid transparent;
 
-				&:not(:last-of-type) {
-					margin-bottom: 10px;
+				&.has-error {
+					border-bottom: 2px solid #ff3838;
 				}
 
 				&:focus {
 					border-bottom: 2px solid var(--theme-color-secondary);
 				}
+			}
+
+			button {
+				margin-top: 10px;
 			}
 
 			.generate-random-roomName-button {
@@ -633,11 +637,14 @@ input {
 			}
 
 			.join-button {
-				margin-top: 15px;
 				padding: 10px;
 				background-image: var(--gradient-button);
 				color: #ffffff;
 				font-size: 0.95em;
+			}
+
+			.error-message {
+				color: #ff3838;
 			}
 		}
 	}

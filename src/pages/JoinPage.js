@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import shortid from 'shortid';
-import { CHECK_IF_ROOM_REQUIRES_PASSCODE, CHECK_IF_ROOM_IS_FULL } from '../SocketActions';
+import { validateData } from '../utils/validators';
 import { notyfError } from '../utils/notyf';
+import { CHECK_IF_ROOM_REQUIRES_PASSCODE, CHECK_IF_ROOM_IS_FULL } from '../SocketActions';
 
 const JoinPage = ({ socket, handleSetCredentials, setAuthorized }) => {
     const history = useHistory();
 	const location = useLocation();
     const [username, setUsername] = useState('');
     const [roomName, setRoomName] = useState('');
-    const [hideRoomNameInput, setHideRoomNameInput] = useState(false);
+	const [hideRoomNameInput, setHideRoomNameInput] = useState(false);
+	const [errors, setErrors] = useState({});
 
     useEffect(() => {
         const getRoomName = () => {
@@ -49,22 +51,12 @@ const JoinPage = ({ socket, handleSetCredentials, setAuthorized }) => {
 	};
 
     const joinRoom = (e) => {
-        e.preventDefault();
-        
-		if (username.trim() === '' || roomName.trim() === '') return;
-		
-        if (!/^[a-zA-Z0-9_-]{1,30}$/.test(username)) {
-			return notyfError('Username must be 1-30 characters', 2500);
-		};
+		e.preventDefault();
 
-		if (!/^[a-zA-Z0-9_-]{1,150}$/.test(roomName)) {
-			return notyfError('Roomname must be 1-30 characters', 2500);
-		};
+		const { valid, errors } = validateData(username, roomName);
 
-		if (roomName.length > 150) {
-			return notyfError('The max length for room name is 150 characters', 2500);
-		};
-		
+		if (!valid) return setErrors(errors);
+
 		socket.emit(CHECK_IF_ROOM_IS_FULL, roomName, (result) => {
 
 			if (result === 'ROOM_IS_FULL') {
@@ -93,10 +85,11 @@ const JoinPage = ({ socket, handleSetCredentials, setAuthorized }) => {
 								<input
 									type='text'
 									name='roomName'
-									id='roomName'
 									value={roomName}
 									onChange={handleOnChangeRoomName}
+									className={ errors.roomName && 'has-error' }
 								/>
+								{ errors.roomName && <span className='error-message'>{errors.roomName}</span> }
 								<button
 									className='generate-random-roomName-button'
 									onClick={handleGenerateRandomRoomName}
@@ -105,15 +98,17 @@ const JoinPage = ({ socket, handleSetCredentials, setAuthorized }) => {
 								</button>
 							</>
 						)}
-						<label htmlFor='name'>Name</label>
+						<label htmlFor='name'>Username</label>
 						<input
 							type='text'
-							name='name'
-							id='name'
+							name='username'
+							id='username'
 							value={username}
 							onChange={handleOnChangeUsername}
 							onKeyDown={preventDefault}
+							className={ errors.username && 'has-error' }
 						/>
+						{ errors.username && <span className='error-message'>{errors.username}</span> }
 						<button className='join-button' onClick={joinRoom}>
 							Join
 						</button>

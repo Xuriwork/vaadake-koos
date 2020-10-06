@@ -25,9 +25,9 @@ import {
 	SET_NEW_HOST,
 	NOTIFY_CLIENT_SUCCESS,
 	NOTIFY_CLIENT_ERROR,
-	GET_PLAYLIST,
-	ADD_TO_PLAYLIST,
-	REMOVE_FROM_PLAYLIST
+	GET_QUEUE,
+	ADD_TO_QUEUE,
+	REMOVE_FROM_QUEUE
 } from '../SocketActions';
 
 import { SettingsContext } from '../context/SettingsContext';
@@ -83,7 +83,7 @@ export class VideoRoom extends Component {
 		socket.on('connect', () => {
 			socket.emit(JOIN, { roomName, username });
 			socket.emit(GET_VIDEO_INFORMATION);
-			socket.emit(GET_PLAYLIST);
+			socket.emit(GET_QUEUE);
 			socket.emit(GET_INVITE_CODE);
 		});
 
@@ -137,7 +137,7 @@ export class VideoRoom extends Component {
 
 		socket.on(SET_HOST, (host) => this.setState({ host }));
 
-		socket.on(GET_PLAYLIST, (queue) => this.setState({ queue }));
+		socket.on(GET_QUEUE, (queue) => this.setState({ queue }));
 	};
 
 	onReady = (e) => {
@@ -202,10 +202,10 @@ export class VideoRoom extends Component {
 		});
 	};
 
-	addToQueue = (video) => this.state.socket.emit(ADD_TO_PLAYLIST, video);
+	addToQueue = (video) => this.state.socket.emit(ADD_TO_QUEUE, video);
 
 	removeFromQueue = (videoId) => {
-		this.state.socket.emit(REMOVE_FROM_PLAYLIST, videoId)
+		this.state.socket.emit(REMOVE_FROM_QUEUE, videoId)
 	};
 
 	sendMessage = (message) => {

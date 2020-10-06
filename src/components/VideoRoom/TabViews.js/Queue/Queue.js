@@ -37,9 +37,9 @@ const Queue = ({ queue, addToQueue, removeFromQueue, handleChangeVideo, setTab }
 			const thumbnail = items[0].snippet.thumbnails.medium.url;
 			const title = items[0].snippet.title;
 
-			const playlistItem = { id, thumbnail, title };
+			const queueItem = { id, thumbnail, title };
 
-			addToQueue(playlistItem);
+			addToQueue(queueItem);
 			setVideoURL('');
 		})
 		.catch((error) => console.error(error));
