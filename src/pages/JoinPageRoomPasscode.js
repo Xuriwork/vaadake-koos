@@ -10,7 +10,7 @@ const JoinPageRoomPasscode = ({ socket, setAuthorized, handleSetCredentials }) =
     useEffect(() => {
         const { state } = history.location;
         if (!state) return history.push('/join');
-        if (!(state.username && state.roomId)) return history.push('/join');
+        if (!(state.username && state.roomName)) return history.push('/join');
 
     }, [history]);
 
@@ -18,12 +18,12 @@ const JoinPageRoomPasscode = ({ socket, setAuthorized, handleSetCredentials }) =
 
     const joinRoom = (e) => {
         e.preventDefault();
-        const { username, roomId } = history.location.state;
+        const { username, roomName } = history.location.state;
 
-        socket.emit(VERIFY_PASSCODE, { roomId, username, passcode: roomPasscode }, (result, other) => {
+        socket.emit(VERIFY_PASSCODE, { roomName, username, passcode: roomPasscode }, (result, other) => {
             if (result === 'CORRECT_PASSCODE') {
                 notyfSuccess('Passcode correct', 5000);
-                handleSetCredentials(username, roomId);
+                handleSetCredentials(username, roomName);
                 setAuthorized(true);
                 history.push('/');
             } else if (result === 'INCORRECT_PASSCODE') {

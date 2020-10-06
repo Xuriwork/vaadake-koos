@@ -7,6 +7,7 @@ import { notyfError, notyfSuccess } from '../utils/notyf';
 
 import {
 	PLAY,
+	GET_INVITE_CODE,
 	JOIN,
 	PAUSE,
 	SYNC_TIME,
@@ -32,7 +33,7 @@ import Tabs from '../components/VideoRoom/Tabs/Tabs';
 import CurrentTab from '../components/VideoRoom/CurrentTab';
 
 const socketURL = process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : process.env.REACT_APP_GAE_API_URL;
-const URL_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)/;
+const YOUTUBE_VIDEO_URL_REGEX = /^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/|\/embed\/.+$/;
 
 const youtubeConfig = {
 	height: '390',
@@ -73,19 +74,22 @@ export class VideoRoom extends Component {
 	};
 
 	onSocketMethods = (socket) => {
-		const { roomId, username } = this.props;
+		const { roomName, username, history } = this.props;
 		const { player } = this.state;
 		
 		socket.on('connect', () => {
-			socket.emit(JOIN, { roomId, username });
+			socket.emit(JOIN, { roomName, username });
 			socket.emit(GET_VIDEO_INFORMATION);
 			socket.emit(GET_PLAYLIST);
+			socket.emit(GET_INVITE_CODE);
 		});
 
 		socket.on('error', (error) => console.error(error));
 
 		socket.on(NOTIFY_CLIENT_ERROR, (message) => notyfError(message, 5000));
 		socket.on(NOTIFY_CLIENT_SUCCESS, (message) => notyfSuccess(message, 5000));
+
+		socket.on(GET_INVITE_CODE, (inviteCode) => history.replace('/', { inviteCode }));
 
 		socket.on(NEW_USER_JOINED, () => this.context.playUserJoinedSound());
 
@@ -160,13 +164,14 @@ export class VideoRoom extends Component {
 
 	handleOnChangeVideoURL = (e) => this.setState({ videoURL: e.target.value });
 
-	handleChangeVideo = (videoId) => {
-		if (videoId) {
-			return this.state.socket.emit(NEW_VIDEO, videoId);
-		} else if (!URL_REGEX.test(this.state.videoURL)) {
+	handleChangeVideo = () => {
+		const { videoURL, socket } = this.state;
+
+		if (!YOUTUBE_VIDEO_URL_REGEX.test(videoURL)) {
 			return notyfError('Invalid URL', 5000);
 		};
-		this.state.socket.emit(NEW_VIDEO, this.state.videoURL);
+		
+		socket.emit(NEW_VIDEO, videoURL);
 	};
 
 	handleOnKeyDown = (e) => {
@@ -201,7 +206,6 @@ export class VideoRoom extends Component {
 	};
 
 	handleSetNewHost = (userId) => this.state.socket.emit(SET_NEW_HOST, userId);
-	handleKickUser = (userId) => this.state.socket.emit('KICK_USER', userId);
 
 	onStateChanged = () => {
 		const { player, socket } = this.state;
@@ -275,7 +279,6 @@ export class VideoRoom extends Component {
 								sendMessage={this.sendMessage}
 								host={host}
 								handleSetNewHost={this.handleSetNewHost}
-								handleKickUser={this.handleKickUser}
 								playlist={playlist}
 								removeFromPlaylist={this.removeFromPlaylist}
 								addToPlaylist={this.addToPlaylist}

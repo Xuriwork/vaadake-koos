@@ -12,7 +12,6 @@ const CurrentTab = ({
 	host,
 	sendMessage,
 	handleSetNewHost,
-	handleKickUser,
 	playlist,
 	addToPlaylist,
 	removeFromPlaylist,
@@ -55,7 +54,6 @@ const CurrentTab = ({
 					host={host}
 					users={users}
 					handleSetNewHost={handleSetNewHost}
-					handleKickUser={handleKickUser}
 				/>
 			)}
 		</div>

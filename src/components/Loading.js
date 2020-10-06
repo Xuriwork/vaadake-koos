@@ -4,7 +4,7 @@ const Loading = () => {
 	return (
 		<div className='loading-screen'>
 			<h1>
-				Please wait, we're doing some magic{' '}
+				Please wait, we're doing some magic
 				<span role='img' aria-label='winking face'>
 					😉
 				</span>
