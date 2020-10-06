@@ -1,6 +1,6 @@
 import React from 'react';
 import Chat from './TabViews.js/Chat';
-import Playlist from './TabViews.js/Playlist/Playlist';
+import Queue from './TabViews.js/Queue/Queue';
 import RoomSettings from './TabViews.js/RoomSettings/RoomSettings';
 
 const CurrentTab = ({
@@ -12,9 +12,9 @@ const CurrentTab = ({
 	host,
 	sendMessage,
 	handleSetNewHost,
-	playlist,
-	addToPlaylist,
-	removeFromPlaylist,
+	queue,
+	addToQueue,
+	removeFromQueue,
 	handleChangeVideo
 }) => {
 
@@ -23,8 +23,8 @@ const CurrentTab = ({
     const currentTabComponentClassName =
 			tab === 'chat'
 				? 'current-tab-component chat-tab'
-				: tab === 'playlist'
-				? 'current-tab-component playlist-tab'
+				: tab === 'queue'
+				? 'current-tab-component queue-tab'
 				: 'current-tab-component room-settings-tab';
 
 	return (
@@ -40,11 +40,11 @@ const CurrentTab = ({
 					sendMessage={sendMessage}
 				/>
 			)}
-			{tab === 'playlist' && (
-				<Playlist
-					playlist={playlist}
-					addToPlaylist={addToPlaylist}
-					removeFromPlaylist={removeFromPlaylist}
+			{tab === 'queue' && (
+				<Queue
+					queue={queue}
+					addToQueue={addToQueue}
+					removeFromQueue={removeFromQueue}
 					handleChangeVideo={handleChangeVideo}
 				/>
 			)}

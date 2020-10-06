@@ -1,5 +1,5 @@
 import React from 'react';
-import { PlaylistIcon, ChatIcon, RoomSettingsIcon } from './TabIcons';
+import { QueueIcon, ChatIcon, RoomSettingsIcon } from './TabIcons';
 
 export const Tabs = ({ tab, setTab }) => {
 
@@ -21,11 +21,11 @@ export const Tabs = ({ tab, setTab }) => {
 			</button>
 			<button
 				role='tab'
-				className={tab === 'playlist' ? 'tab active' : 'tab'}
-				onClick={() => handleChangeTabView('playlist')}
+				className={tab === 'queue' ? 'tab active' : 'tab'}
+				onClick={() => handleChangeTabView('queue')}
 			>
-				<PlaylistIcon />
-				Playlist
+				<QueueIcon />
+				Queue
 			</button>
 			<button
 				role='tab'

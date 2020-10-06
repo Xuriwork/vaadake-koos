@@ -179,27 +179,27 @@ io.on('connection', (socket) => {
 
   socket.on(GET_PLAYLIST, () => {
     const room = getRoomByName(socket.roomName);
-    socket.emit(GET_PLAYLIST, room.playlist);
+    socket.emit(GET_PLAYLIST, room.queue);
   });
 
   socket.on(ADD_TO_PLAYLIST, (data) => {
     const room = getRoomByName(socket.roomName);
 
-    const videoExist = room.playlist.find((video) => video.id === data.id);
+    const videoExist = room.queue.find((video) => video.id === data.id);
     if (!!videoExist) return;
 
-    room.playlist.push(data);
-    io.to(socket.roomName).emit(GET_PLAYLIST, room.playlist);
+    room.queue.push(data);
+    io.to(socket.roomName).emit(GET_PLAYLIST, room.queue);
   });
 
   socket.on(REMOVE_FROM_PLAYLIST, (data) => {
     const room = getRoomByName(socket.roomName);
-    const playlist = room.playlist;
+    const queue = room.queue;
 
-    const index = playlist.findIndex((video) => video.id === data);
-    if (index !== -1) playlist.splice(index, 1);
+    const index = queue.findIndex((video) => video.id === data);
+    if (index !== -1) queue.splice(index, 1);
 
-    io.to(socket.roomName).emit(GET_PLAYLIST, playlist);
+    io.to(socket.roomName).emit(GET_PLAYLIST, queue);
   });
 
   socket.on(SEND_MESSAGE, (data) => {

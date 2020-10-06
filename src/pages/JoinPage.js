@@ -32,7 +32,15 @@ const JoinPage = ({ socket, handleSetCredentials, setAuthorized }) => {
 
     const handleGenerateRandomRoomName = (e) => setRoomName(createRandomRoomName(e));
 
-    const preventDefault = (e) => e.keyCode === 13 && e.preventDefault();
+    const preventDefault = (e) => {
+		if (e.keyCode === 13 && hideRoomNameInput) {
+			return joinRoom(e);
+		};
+		if (e.keyCode === 13 && roomName.trim() !== '' && username.trim() !== '') {
+			joinRoom(e);
+		};
+		e.keyCode === 13 && e.preventDefault();
+	};
 
 	const createRandomRoomName = (e) => {
         e.preventDefault();
@@ -47,6 +55,10 @@ const JoinPage = ({ socket, handleSetCredentials, setAuthorized }) => {
 		
         if (!/^[a-zA-Z0-9_-]{1,30}$/.test(username)) {
 			return notyfError('Username must be 1-30 characters', 2500);
+		};
+
+		if (!/^[a-zA-Z0-9_-]{1,150}$/.test(roomName)) {
+			return notyfError('Roomname must be 1-30 characters', 2500);
 		};
 
 		if (roomName.length > 150) {
