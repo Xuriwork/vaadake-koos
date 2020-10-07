@@ -85,6 +85,7 @@ const JoinPage = ({ socket, handleSetCredentials, setAuthorized }) => {
 								<input
 									type='text'
 									name='roomName'
+									id='roomName'
 									value={roomName}
 									onChange={handleOnChangeRoomName}
 									className={ errors.roomName && 'has-error' }
@@ -98,7 +99,7 @@ const JoinPage = ({ socket, handleSetCredentials, setAuthorized }) => {
 								</button>
 							</>
 						)}
-						<label htmlFor='name'>Username</label>
+						<label htmlFor='username'>Username</label>
 						<input
 							type='text'
 							name='username'
