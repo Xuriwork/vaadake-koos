@@ -28,6 +28,9 @@
 		#5794e9 120%
 	);
 
+	--generate-random-roomname-button-lm: #E90D59;
+	--generate-random-roomname-button-dm: #12e2a3;
+
 	--dropdown-box-shadow-lm: rgba(179, 77, 148, 0.4) 5px 5px,
 		rgba(179, 77, 148, 0.3) 10px 10px, rgba(179, 77, 148, 0.2) 15px 15px,
 		rgba(179, 77, 148, 0.1) 20px 20px, rgba(179, 77, 148, 0.05) 25px 25px;
@@ -71,6 +74,7 @@
 	--text: var(--text-lm);
 	--gradient-button: var(--gradient-button-lm);
 	--gradient-button-180deg: var(--gradient-button-180deg-lm);
+	--generate-random-roomname-button: var(--generate-random-roomname-button-lm);
 	--dropdown-box-shadow: var(--dropdown-box-shadow-lm);
 	--volume-slider: var(--volume-slider-lm);
 	--tab-content-background: var(--tab-content-background-lm);
@@ -90,6 +94,7 @@
 	--text: var(--text-dm);
 	--gradient-button: var(--gradient-button-dm);
 	--gradient-button-180deg: var(--gradient-button-180deg-dm);
+	--generate-random-roomname-button: var(--generate-random-roomname-button-dm);
 	--dropdown-box-shadow: var(--dropdown-box-shadow-dm);
 	--volume-slider: var(--volume-slider-dm);
 	--tab-content-background: var(--tab-content-background-dm);
@@ -622,16 +627,16 @@ input {
 				margin-top: 10px;
 			}
 
-			.generate-random-roomName-button {
+			.generate-random-roomname-button {
 				padding: 8px;
 				background-color: transparent;
-				color: #ec3160;
+				color: var(--theme-color);
 				font-size: 0.95em;
 				margin-bottom: 15px;
-				border: 1px solid#ec3160;
+				border: 1px solid var(--theme-color);
 
 				&:hover {
-					background-color: #ec3160;
+					background-color: var(--theme-color);
 					color: #ffffff;
 				}
 			}

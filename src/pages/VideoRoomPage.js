@@ -46,6 +46,7 @@ const youtubeConfig = {
 		rel: 0,
 		modestbranding: 1,
 		autoplay: 1,
+		origin: 'https://vaadakekoos.web.app'
 	},
 };
 

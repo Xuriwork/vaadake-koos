@@ -27,3 +27,4 @@ hosting.*
 firebase-debug.log
 .vscode
 .env
+firebase.json

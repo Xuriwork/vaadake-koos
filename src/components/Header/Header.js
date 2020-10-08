@@ -36,8 +36,8 @@ const Header = ({ roomName }) => {
 	};
 
 	return (
-		<nav className='header'>
-			<Link to='/'>
+		<header className='header'>
+			<Link to='/join'>
 				<img src={Logo} alt='logo' className='logo' />
 			</Link>
 			{roomName && (
@@ -80,7 +80,7 @@ const Header = ({ roomName }) => {
 					dropdownButtonRef={dropdownButtonRef}
 				/>
 			)}
-		</nav>
+		</header>
 	);
 };
 

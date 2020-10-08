@@ -92,7 +92,7 @@ const JoinPage = ({ socket, handleSetCredentials, setAuthorized }) => {
 								/>
 								{ errors.roomName && <span className='error-message'>{errors.roomName}</span> }
 								<button
-									className='generate-random-roomName-button'
+									className='generate-random-roomname-button'
 									onClick={handleGenerateRandomRoomName}
 								>
 									Generate Random Room Name
