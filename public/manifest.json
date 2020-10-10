@@ -19,8 +19,8 @@
     },
     {
       "src": "./images/logo180.png",
-      "sizes": "512x512",
       "type": "image/png",
+      "sizes": "180x180",
       "purpose": "any maskable"
     }
   ],

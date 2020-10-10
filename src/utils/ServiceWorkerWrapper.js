@@ -26,7 +26,7 @@ const ServiceWorkerWrapper = ({ children }) => {
         <>
             { newVersionAvailable && (
                 <div className='new_update-toast'>
-                    New version available, click to reload 
+                    New update, click to reload 
                     <button onClick={handleReloadPage}>RELOAD</button>
                 </div>
             ) }
