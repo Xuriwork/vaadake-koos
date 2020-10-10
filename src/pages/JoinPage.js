@@ -45,7 +45,7 @@ const JoinPage = ({ socket, handleSetCredentials, setAuthorized }) => {
 	};
 
 	const createRandomRoomName = (e) => {
-        e.preventDefault();
+		e.preventDefault();
         const randomId = shortid.generate() + shortid.generate();
 		return randomId;
 	};
@@ -73,7 +73,7 @@ const JoinPage = ({ socket, handleSetCredentials, setAuthorized }) => {
 				};
 			});
 		});
-    };
+	};
 
     return (
 			<div className='join-page'>

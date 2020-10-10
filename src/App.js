@@ -26,50 +26,50 @@ const App = () => {
 	};
 	
 	return (
-		<BrowserRouter>
-			<Header roomName={info.roomName} />
-			<div className='app-component'>
-				<Switch>
-					<Route
-						exact
-						path='/'
-						component={() => (
-							<RoomPage
-								username={info.username}
-								roomName={info.roomName}
-								authorized={authorized}
-								setAuthorized={setAuthorized}
-							/>
-						)}
-					/>
-					<Route
-						path='/invite/:inviteCode'
-						component={() => <InvitedPage socket={socket} />}
-					/>
-					<Route
-						path='/join'
-						component={() => (
-							<JoinPage
-								handleSetCredentials={handleSetCredentials}
-								socket={socket}
-								setAuthorized={setAuthorized}
-							/>
-						)}
-					/>
-					<Route
-						path='/enter-passcode'
-						component={() => (
-							<JoinPageRoomPasscode
-								handleSetCredentials={handleSetCredentials}
-								socket={socket}
-								setAuthorized={setAuthorized}
-							/>
-						)}
-					/>
-					<Route component={NotFoundPage} />
-				</Switch>
-			</div>
-		</BrowserRouter>
+			<BrowserRouter>
+				<Header roomName={info.roomName} />
+				<div className='app-component'>
+					<Switch>
+						<Route
+							exact
+							path='/'
+							component={() => (
+								<RoomPage
+									username={info.username}
+									roomName={info.roomName}
+									authorized={authorized}
+									setAuthorized={setAuthorized}
+								/>
+							)}
+						/>
+						<Route
+							path='/invite/:inviteCode'
+							component={() => <InvitedPage socket={socket} />}
+						/>
+						<Route
+							path='/join'
+							component={() => (
+								<JoinPage
+									handleSetCredentials={handleSetCredentials}
+									socket={socket}
+									setAuthorized={setAuthorized}
+								/>
+							)}
+						/>
+						<Route
+							path='/enter-passcode'
+							component={() => (
+								<JoinPageRoomPasscode
+									handleSetCredentials={handleSetCredentials}
+									socket={socket}
+									setAuthorized={setAuthorized}
+								/>
+							)}
+						/>
+						<Route component={NotFoundPage} />
+					</Switch>
+				</div>
+			</BrowserRouter>
 	);
 };
 
