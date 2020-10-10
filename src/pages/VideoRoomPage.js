@@ -100,13 +100,9 @@ export class VideoRoom extends Component {
 
 		socket.on(PAUSE, () => player.pauseVideo());
 
-		socket.on(GET_HOST_TIME, () => {
-			console.log('GET_HOST_TIME');
-			socket.emit(SYNC_WITH_HOST);
-		});
+		socket.on(GET_HOST_TIME, () => socket.emit(SYNC_WITH_HOST));
 
 		socket.on(SYNC_WITH_HOST, () => {
-			console.log('SYNC_WITH_HOST');
 			socket.emit(SYNC_TIME, player.getCurrentTime());
 		});
 
@@ -142,11 +138,6 @@ export class VideoRoom extends Component {
 		socket.on(SET_HOST, (host) => this.setState({ host }));
 
 		socket.on(GET_QUEUE, (queue) => this.setState({ queue }));
-
-		socket.on('SYNC_BUTTON', () => {
-			console.log('SYNC_BUTTON');
-			socket.emit(GET_HOST_TIME);
-		})
 	};
 
 	onReady = (e) => {
@@ -169,12 +160,6 @@ export class VideoRoom extends Component {
 		} else id = url;
 
 		return id;
-	};
-
-	handleSyncVideo = () => {
-		//if (this.state.host === this.state.socket.id) return;
-		this.state.socket.emit('SYNC_BUTTON');
-		notyfSuccess('Syncing', 1000);
 	};
 
 	syncTime = (currentTime) => {

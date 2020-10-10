@@ -163,11 +163,6 @@ io.on('connection', (socket) => {
     socket.to(user.roomName).emit(SYNC_TIME, currentTime);
   });
 
-  socket.on('SYNC_BUTTON', () => {
-    const room = getRoomByName(socket.roomName);
-    socket.broadcast.to(room.host).emit(GET_HOST_TIME);
-  });
-
   socket.on(SYNC_VIDEO_INFORMATION, (data) => {
     const user = getUser(socket.id);
     io.to(user.roomName).emit(SYNC_VIDEO_INFORMATION, data);

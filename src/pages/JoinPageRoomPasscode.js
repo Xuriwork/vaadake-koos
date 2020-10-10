@@ -39,7 +39,7 @@ const JoinPageRoomPasscode = ({ socket, setAuthorized, handleSetCredentials }) =
                     <label htmlFor='roomPasscode'>Room Passcode</label>
                     <input
                         type='text'
-                        name='name'
+                        name='roomPasscode'
                         id='roomPasscode'
                         value={roomPasscode}
                         onChange={handleOnChangeRoomPasscode}
