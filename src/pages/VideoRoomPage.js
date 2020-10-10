@@ -15,7 +15,6 @@ import {
 	GET_HOST_TIME,
 	GET_VIDEO_INFORMATION,
 	SYNC_VIDEO_INFORMATION,
-	SYNC_VIDEO_WITH_HOST,
 	VIDEO_CHANGED,
 	SEND_MESSAGE,
 	MESSAGE,
@@ -101,9 +100,13 @@ export class VideoRoom extends Component {
 
 		socket.on(PAUSE, () => player.pauseVideo());
 
-		socket.on(GET_HOST_TIME, () => socket.emit(SYNC_WITH_HOST));
+		socket.on(GET_HOST_TIME, () => {
+			console.log('GET_HOST_TIME');
+			socket.emit(SYNC_WITH_HOST);
+		});
 
-		socket.on(SYNC_VIDEO_WITH_HOST, () => {
+		socket.on(SYNC_WITH_HOST, () => {
+			console.log('SYNC_WITH_HOST');
 			socket.emit(SYNC_TIME, player.getCurrentTime());
 		});
 
@@ -113,7 +116,7 @@ export class VideoRoom extends Component {
 			player.loadVideoById({
 				videoId: this.convertURLToYoutubeVideoId(videoURL)
 			});
-			socket.emit(SYNC_VIDEO_WITH_HOST);
+			socket.emit(SYNC_WITH_HOST);
 		});
 
 		socket.on(GET_VIDEO_INFORMATION, () => {
@@ -139,6 +142,11 @@ export class VideoRoom extends Component {
 		socket.on(SET_HOST, (host) => this.setState({ host }));
 
 		socket.on(GET_QUEUE, (queue) => this.setState({ queue }));
+
+		socket.on('SYNC_BUTTON', () => {
+			console.log('SYNC_BUTTON');
+			socket.emit(GET_HOST_TIME);
+		})
 	};
 
 	onReady = (e) => {
@@ -163,13 +171,21 @@ export class VideoRoom extends Component {
 		return id;
 	};
 
+	handleSyncVideo = () => {
+		//if (this.state.host === this.state.socket.id) return;
+		this.state.socket.emit('SYNC_BUTTON');
+		notyfSuccess('Syncing', 1000);
+	};
+
 	syncTime = (currentTime) => {
+		const { player } = this.state;
+
 		if (
-			this.state.player.getCurrentTime() < currentTime - 0.5 ||
-			this.state.player.getCurrentTime() > currentTime + 0.5
+			player.getCurrentTime() < currentTime - 0.5 ||
+			player.getCurrentTime() > currentTime + 0.5
 		) {
-			this.state.player.seekTo(currentTime);
-			this.state.player.playVideo();
+			player.seekTo(currentTime);
+			player.playVideo();
 		}
 	};
 
@@ -203,18 +219,15 @@ export class VideoRoom extends Component {
 		});
 	};
 
-	addToQueue = (video) => this.state.socket.emit(ADD_TO_QUEUE, video);
-
-	removeFromQueue = (videoId) => {
-		this.state.socket.emit(REMOVE_FROM_QUEUE, videoId)
-	};
-
 	sendMessage = (message) => {
 		this.state.socket.emit(SEND_MESSAGE, {
 			content: message,
 			username: this.props.username,
 		});
 	};
+
+	addToQueue = (video) => this.state.socket.emit(ADD_TO_QUEUE, video);
+	removeFromQueue = (videoId) => this.state.socket.emit(REMOVE_FROM_QUEUE, videoId);
 
 	handleSetNewHost = (userId) => this.state.socket.emit(SET_NEW_HOST, userId);
 
@@ -252,11 +265,14 @@ export class VideoRoom extends Component {
 
 		return (
 			<>
-				{ loading && <Loading /> }
+				{loading && <Loading />}
 				<Tabs tab={tab} setTab={this.setTab} />
 				<div className='video-room-page'>
 					<div className='video-and-current-tab-container'>
-						<div className='video-and-input-container' data-chatishidden={this.context.tabContentHidden}>
+						<div
+							className='video-and-input-container'
+							data-chatishidden={this.context.tabContentHidden}
+						>
 							<div className='embed-responsive embed-responsive-16by9'>
 								<YouTube
 									videoId='_hql7mO-zaA'
@@ -279,8 +295,7 @@ export class VideoRoom extends Component {
 								<button onClick={this.handleChangeVideo}>Change Video</button>
 							</div>
 						</div>
-						{
-							!this.context.tabContentHidden && (
+						{!this.context.tabContentHidden && (
 							<CurrentTab
 								tab={tab}
 								setTab={this.setTab}
@@ -295,7 +310,7 @@ export class VideoRoom extends Component {
 								addToQueue={this.addToQueue}
 								handleChangeVideo={this.handleChangeVideo}
 							/>
-							)}
+						)}
 					</div>
 				</div>
 			</>

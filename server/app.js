@@ -135,26 +135,37 @@ io.on('connection', (socket) => {
   });
 
   socket.on(PLAY, () => {
+    const room = getRoomByName(socket.roomName);
+    if (room.host !== socket.id) return;
+
     const user = getUser(socket.id);
     socket.to(user.roomName).emit(PLAY);
   });
 
   socket.on(PAUSE, () => {
+    const room = getRoomByName(socket.roomName);
+    if (room.host !== socket.id) return;
+
     const user = getUser(socket.id);
     socket.to(user.roomName).emit(PAUSE);    
   });
 
   socket.on(SYNC_WITH_HOST, () => {
     const room = getRoomByName(socket.roomName);
-    
+
     if (socket.id !== room.host) {
-      socket.broadcast.to(room.host).emit(GET_HOST_TIME);
+      socket.broadcast.emit(GET_HOST_TIME);
     } else socket.emit(SYNC_WITH_HOST);
   });
 
   socket.on(SYNC_TIME, (currentTime) => {
     const user = getUser(socket.id);
     socket.to(user.roomName).emit(SYNC_TIME, currentTime);
+  });
+
+  socket.on('SYNC_BUTTON', () => {
+    const room = getRoomByName(socket.roomName);
+    socket.broadcast.to(room.host).emit(GET_HOST_TIME);
   });
 
   socket.on(SYNC_VIDEO_INFORMATION, (data) => {
