@@ -1,17 +1,20 @@
 import React, { useState, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { notyfError, notyfSuccess } from '../../utils/notyf';
-
-import Logo from '../../assets/images/vaadake_koos_logo.svg';
-import InviteUserIcon from '../../assets/icons/user-add-fill.svg';
+import { useSettings } from '../../context/SettingsContext';
 
 import Dropdown from './Dropdown/Dropdown';
+
+import Logo from '../../assets/images/vaadake_koos_logo.svg';
+import LogoDarkMode from '../../assets/images/vaadake_koos_logo_dm.svg';
+import InviteUserIcon from '../../assets/icons/user-add-fill.svg';
 
 const Header = ({ roomName }) => {
 	const roomNameInputRef = useRef(null);
 	const dropdownButtonRef = useRef(null);
 	const [dropdownOpen, setDropdownOpen] = useState(false);
 	const location = useLocation();
+	const { theme } = useSettings();
     
 	const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 	const closeDropdown = () => setTimeout(() => setDropdownOpen(false), 250);
@@ -38,7 +41,11 @@ const Header = ({ roomName }) => {
 	return (
 		<header className='header'>
 			<Link to='/join'>
-				<img src={Logo} alt='logo' className='logo' />
+				{theme === 'light' ? (
+					<img src={Logo} alt='logo' className='logo' />
+				) : (
+					<img src={LogoDarkMode} alt='logo' className='logo' />
+				)}
 			</Link>
 			{roomName && (
 				<div className='roomName-code-container'>
