@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+import swConfig from './swConfig';
 import SettingsProvider from './context/SettingsContext';
 
 ReactDOM.render(
@@ -14,4 +15,4 @@ ReactDOM.render(
   document.getElementById('root')
 );
 
-serviceWorker.register();
+serviceWorker.register(swConfig);

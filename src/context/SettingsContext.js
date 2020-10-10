@@ -19,9 +19,11 @@ const SettingsProvider = ({ children }) => {
         if (theme === 'light' && document.body.classList.contains('dark')) {
             document.body.classList.remove('dark');
             document.body.classList.add('light');
+            document.querySelector('meta[name="theme-color"]').setAttribute("content", '#f02eaa');
         } else if (theme === 'dark' && document.body.classList.contains('light')) {
             document.body.classList.remove('light');
             document.body.classList.add('dark');
+            document.querySelector('meta[name="theme-color"]').setAttribute("content", '#41d6d6');
         };
     }, [theme]);
     

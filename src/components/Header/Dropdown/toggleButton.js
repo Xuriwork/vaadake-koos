@@ -6,9 +6,8 @@ const toggleButton = (ref, name, set) => {
 		toggledOn.classList.remove('toggled');
 		toggledOff.classList.add('toggled');
 		if (name === 'toggleDarkModeButton') set('light');
-        else if (name === 'toggleChatButton') set(true);
-        
-        //SAVE TO LCOAL STORAGE
+		else if (name === 'toggleChatButton') set(true);
+		
 	} else if (toggledOff.classList.contains('toggled')) {
 		toggledOff.classList.remove('toggled');
 		toggledOn.classList.add('toggled');
