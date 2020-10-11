@@ -78,7 +78,7 @@ const RoomSettings = ({ socket, host, users, handleSetNewHost }) => {
 				<li>
 					<label htmlFor='room-passcode'>Room Passcode</label>
 					<input
-						type='text'
+						type='password'
 						id='room-passcode'
 						value={roomPasscode}
 						onChange={handleOnChangeRoomPasscode}

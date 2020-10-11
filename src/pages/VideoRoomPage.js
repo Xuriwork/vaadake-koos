@@ -7,7 +7,7 @@ import { notyfError, notyfSuccess } from '../utils/notyf';
 
 import {
 	PLAY,
-	GET_INVITE_CODE,
+	GET_ROOM_CODE,
 	JOIN,
 	PAUSE,
 	SYNC_TIME,
@@ -66,6 +66,7 @@ export class VideoRoom extends Component {
 
 	componentDidMount() {
 		const { authorized, history } = this.props;
+		console.log(authorized);
 		if (!authorized) return history.push('/join');
 	};
 
@@ -84,7 +85,7 @@ export class VideoRoom extends Component {
 			socket.emit(JOIN, { roomName, username });
 			socket.emit(GET_VIDEO_INFORMATION);
 			socket.emit(GET_QUEUE);
-			socket.emit(GET_INVITE_CODE);
+			socket.emit(GET_ROOM_CODE);
 		});
 
 		socket.on('error', (error) => console.error(error));
@@ -92,7 +93,10 @@ export class VideoRoom extends Component {
 		socket.on(NOTIFY_CLIENT_ERROR, (message) => notyfError(message, 5000));
 		socket.on(NOTIFY_CLIENT_SUCCESS, (message) => notyfSuccess(message, 5000));
 
-		socket.on(GET_INVITE_CODE, (inviteCode) => history.replace('/', { inviteCode }));
+		socket.on(GET_ROOM_CODE, (roomCode) => {
+			console.log(roomCode);
+			history.replace('/', { roomCode });
+		});
 
 		socket.on(NEW_USER_JOINED, () => this.context.playUserJoinedSound());
 
@@ -102,9 +106,7 @@ export class VideoRoom extends Component {
 
 		socket.on(GET_HOST_TIME, () => socket.emit(SYNC_WITH_HOST));
 
-		socket.on(SYNC_WITH_HOST, () => {
-			socket.emit(SYNC_TIME, player.getCurrentTime());
-		});
+		socket.on(SYNC_WITH_HOST, () => socket.emit(SYNC_TIME, player.getCurrentTime()));
 
 		socket.on(SYNC_TIME, (currentTime) => this.syncTime(currentTime));
 
@@ -124,7 +126,7 @@ export class VideoRoom extends Component {
 		});
 
 		socket.on(SYNC_VIDEO_INFORMATION, (data) => {
-			const videoId = this.convertURLToYoutubeVideoId(data.videoURL)
+			const videoId = this.convertURLToYoutubeVideoId(data.videoURL);
 			player.loadVideoById({
 				videoId,
 				startSeconds: data.currentTime

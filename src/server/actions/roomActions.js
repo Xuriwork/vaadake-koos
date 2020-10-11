@@ -1,10 +1,10 @@
 const rooms = [];
 
-const addRoom = ({ host, name, shortURLCode }) => {
+const addRoom = ({ host, name, roomCode }) => {
 
     name = name.trim();
 
-    const room = { host, name, shortURLCode, queue: [], maxRoomSize: 20 };
+    const room = { host, name, roomCode, queue: [], maxRoomSize: 20 };
     rooms.push(room);
 
     return room;
@@ -16,6 +16,6 @@ const removeRoom = (id) => {
 };
 
 const getRoomByName = (roomName) => rooms.filter((room) => room.name === roomName)[0];
-const getRoomByShortURLCode = (shortURLCode) => rooms.filter((room) => room.shortURLCode === shortURLCode)[0];
+const getRoomByRoomCode = (roomCode) => rooms.filter((room) => room.roomCode === roomCode)[0];
 
-module.exports = { addRoom, getRoomByName, removeRoom, getRoomByShortURLCode };
+module.exports = { addRoom, getRoomByName, removeRoom, getRoomByRoomCode };

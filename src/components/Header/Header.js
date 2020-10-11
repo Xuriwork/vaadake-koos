@@ -32,9 +32,9 @@ const Header = ({ roomName }) => {
 		}, () => notyfError('Failed to copy invite link 🙁', 3000));
 	};
 
-	const handleGetInviteCode = () => {
-		const inviteCode = location.state.inviteCode;
-		const inviteLink = `${window.location.href}invite/${inviteCode}`;
+	const handleGetRoomCode = () => {
+		const roomCode = location.state.roomCode;
+		const inviteLink = `${window.location.href}invite/${roomCode}`;
 		updateClipboard(inviteLink);
 	};
 
@@ -56,7 +56,7 @@ const Header = ({ roomName }) => {
 						className='roomName-code-input'
 						onClick={copyToClipboard}
 					/>
-					<button onClick={handleGetInviteCode}>
+					<button onClick={handleGetRoomCode}>
 						<img src={InviteUserIcon} alt='Get invite link' />
 					</button>
 				</div>

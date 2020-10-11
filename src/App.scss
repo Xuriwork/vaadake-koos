@@ -746,17 +746,6 @@ input {
 	justify-content: space-between;
 	margin-top: 10px;
 	display: flex;
-
-	.sync-button {
-		@extend %flex-complete-center-column;
-		width: 30px;
-		margin-left: 0;
-		margin-right: 10px;
-
-		svg {
-			width: 20px;
-		}
-	}
 }
 
 .users-list-container {

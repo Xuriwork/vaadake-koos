@@ -6,12 +6,11 @@ const bcrypt = require('bcrypt');
 const shortid = require('shortid');
 
 const { addUser, removeUser, getUser, getAllUsersInRoom } = require('./actions/userActions');
-const { addRoom, removeRoom, getRoomByName, getRoomByShortURLCode } = require('./actions/roomActions');
+const { addRoom, removeRoom, getRoomByName, getRoomByRoomCode } = require('./actions/roomActions');
 
 const {
   CHECK_IF_ROOM_REQUIRES_PASSCODE,
-  GET_INVITE_CODE,
-  REQUIRES_PASSCODE,
+  GET_ROOM_CODE,
   VERIFY_PASSCODE,
   SET_ROOM_PASSCODE,
 	PLAY,
@@ -57,20 +56,19 @@ io.on('connection', (socket) => {
     const room = getRoomByName(roomName);
 
     if (room && room.numberOfUsers === room.maxRoomSize) {
-      return callback('ROOM_IS_FULL', true);
+      return callback(true);
     };
-
-    callback(null, false);
+    callback(false);
   });
 
   socket.on(CHECK_IF_ROOM_REQUIRES_PASSCODE, (roomName, callback) => {
     const room = getRoomByName(roomName);
     
     if (room && room.passcode) {
-      return callback(REQUIRES_PASSCODE, true);
+      return callback(true);
     };
 
-    callback(null, false);
+    callback(false);
   });
 
   socket.on(VERIFY_PASSCODE, ({ roomName, passcode }, callback) => {
@@ -78,13 +76,13 @@ io.on('connection', (socket) => {
 
     bcrypt.compare(passcode, room.passcode)
     .then((result) => {
-      if (result === true) return callback('CORRECT_PASSCODE', true);
-      callback('INCORRECT_PASSCODE', false);
+      if (result === true) return callback(true);
+      callback(false);
     });
   });
 
-  socket.on(GET_SHORT_URL, (shortURLCode, callback) => {
-    const room = getRoomByShortURLCode(shortURLCode);
+  socket.on(GET_SHORT_URL, (roomCode, callback) => {
+    const room = getRoomByRoomCode(roomCode);
 
     if (room && room.name) return callback(true, room.name);
     callback(false, null);
@@ -107,7 +105,7 @@ io.on('connection', (socket) => {
     socket.to(user.roomName).emit(NEW_USER_JOINED);
     
     const users = getAllUsersInRoom(user.roomName);
-    if (!room) addRoom({ name: user.roomName, host: users[0].id, shortURLCode: shortid.generate() });
+    if (!room) addRoom({ name: user.roomName, host: users[0].id, roomCode: shortid.generate() });
 
     const { host } = getRoomByName(user.roomName);
 
@@ -115,9 +113,9 @@ io.on('connection', (socket) => {
     io.in(user.roomName).emit(GET_USERS, users);
   });
 
-  socket.on(GET_INVITE_CODE, () => {
+  socket.on(GET_ROOM_CODE, () => {
     const room = getRoomByName(socket.roomName);
-    socket.emit(GET_INVITE_CODE, room.shortURLCode);
+    socket.emit(GET_ROOM_CODE, room.roomCode);
   });
 
   socket.on(SET_NEW_HOST, (newHost) => {

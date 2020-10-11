@@ -20,13 +20,18 @@ const JoinPageRoomPasscode = ({ socket, setAuthorized, handleSetCredentials }) =
         e.preventDefault();
         const { username, roomName } = history.location.state;
 
-        socket.emit(VERIFY_PASSCODE, { roomName, username, passcode: roomPasscode }, (result, other) => {
-            if (result === 'CORRECT_PASSCODE') {
+        socket.emit(VERIFY_PASSCODE, { roomName, passcode: roomPasscode }, (result) => {
+
+            console.log(roomName);
+            console.log(roomPasscode);
+            console.log(result);
+
+            if (result === true) {
                 notyfSuccess('Passcode correct', 5000);
                 handleSetCredentials(username, roomName);
                 setAuthorized(true);
                 history.push('/');
-            } else if (result === 'INCORRECT_PASSCODE') {
+            } else if (result === false) {
                 notyfError('Incorrect passcode', 5000);
             };
         });

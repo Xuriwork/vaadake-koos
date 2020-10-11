@@ -62,14 +62,14 @@ const JoinPage = ({ socket, handleSetCredentials, setAuthorized }) => {
 
 		socket.emit(CHECK_IF_ROOM_IS_FULL, roomName, (result) => {
 
-			if (result === 'ROOM_IS_FULL') {
+			if (result) {
 				return notyfError('Sorry, this room is full', 2500);
 			};
 
 			socket.emit(CHECK_IF_ROOM_REQUIRES_PASSCODE, roomName, (result) => {
-				if (result === 'REQUIRES_PASSCODE') {
+				if (result) {
 					return history.push('/enter-passcode', { username, roomName });
-				} else if (!result) {
+				} else {
 					handleSetCredentials(username, roomName);
 					setAuthorized(true);
 					history.push('/');
