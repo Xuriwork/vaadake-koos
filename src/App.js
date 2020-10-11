@@ -63,6 +63,8 @@ const App = () => {
 									handleSetCredentials={handleSetCredentials}
 									socket={socket}
 									setAuthorized={setAuthorized}
+									username={info.username}
+									roomName={info.roomName}
 								/>
 							)}
 						/>

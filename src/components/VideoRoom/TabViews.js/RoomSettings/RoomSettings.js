@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { SET_MAX_ROOM_SIZE, SET_ROOM_PASSCODE } from '../../../../SocketActions';
 import Modal from './UserActionsModal';
 import { SheildIcon } from './SheildIcon';
+import { validatePasscode } from '../../../../utils/validators';
+import { notyfError } from '../../../../utils/notyf';
 
 const RoomSettings = ({ socket, host, users, handleSetNewHost }) => {
     const [roomPasscode, setRoomPasscode] = useState('');
@@ -12,10 +14,15 @@ const RoomSettings = ({ socket, host, users, handleSetNewHost }) => {
 	const handleOnChangeMaxRoomSize = (e) => setMaxRoomSize(e.target.value);
 
 	const handleSaveSettings = () => {
-		if (roomPasscode.trim() !== '') {
-			socket.emit(SET_ROOM_PASSCODE, roomPasscode);
-		};
+		const error = validatePasscode(roomPasscode);
 
+		if (error) {
+			setRoomPasscode('');
+			return notyfError(error, 3000);
+		};
+	
+		socket.emit(SET_ROOM_PASSCODE, roomPasscode);
+		
 		if (maxRoomSize > 0) {
 			socket.emit(SET_MAX_ROOM_SIZE, (maxRoomSize * 1));
 		};

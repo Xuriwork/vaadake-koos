@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import shortid from 'shortid';
-import { validateData } from '../utils/validators';
+import { validateJoinRoomData } from '../utils/validators';
 import { notyfError } from '../utils/notyf';
 import { generateName } from '../utils/generateRandomName';
 import { CHECK_IF_ROOM_REQUIRES_PASSCODE, CHECK_IF_ROOM_IS_FULL } from '../SocketActions';
@@ -56,7 +56,7 @@ const JoinPage = ({ socket, handleSetCredentials, setAuthorized }) => {
     const joinRoom = (e) => {
 		e.preventDefault();
 
-		const { valid, errors } = validateData(username, roomName);
+		const { valid, errors } = validateJoinRoomData(username, roomName);
 
 		if (!valid) return setErrors(errors);
 
@@ -67,10 +67,11 @@ const JoinPage = ({ socket, handleSetCredentials, setAuthorized }) => {
 			};
 
 			socket.emit(CHECK_IF_ROOM_REQUIRES_PASSCODE, roomName, (result) => {
+				handleSetCredentials(username, roomName);
+
 				if (result) {
-					return history.push('/enter-passcode', { username, roomName });
+					return history.push('/enter-passcode');
 				} else {
-					handleSetCredentials(username, roomName);
 					setAuthorized(true);
 					history.push('/');
 				};

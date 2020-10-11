@@ -1,39 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { notyfError, notyfSuccess } from '../utils/notyf';
+import { notyfError, notyfRedirecting } from '../utils/notyf';
 import { VERIFY_PASSCODE } from '../SocketActions';
+import { isEmpty } from '../utils/validators';
 
-const JoinPageRoomPasscode = ({ socket, setAuthorized, handleSetCredentials }) => {
+const JoinPageRoomPasscode = ({ socket, setAuthorized, handleSetCredentials, roomName, username }) => {
     const history = useHistory();
     const [roomPasscode, setRoomPasscode] = useState('');
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        const { state } = history.location;
-        if (!state) return history.push('/join');
-        if (!(state.username && state.roomName)) return history.push('/join');
-
-    }, [history]);
+        if (!(roomName && username)) return history.push('/join');
+    }, [history, roomName, username]);
 
     const handleOnChangeRoomPasscode = (e) => setRoomPasscode(e.target.value);
 
-    const joinRoom = (e) => {
+    const joinRoom = async (e) => {
         e.preventDefault();
-        const { username, roomName } = history.location.state;
+
+        if (isEmpty(roomPasscode)) return setError('This field is required');
 
         socket.emit(VERIFY_PASSCODE, { roomName, passcode: roomPasscode }, (result) => {
-
-            console.log(roomName);
-            console.log(roomPasscode);
-            console.log(result);
-
             if (result === true) {
-                notyfSuccess('Passcode correct', 5000);
-                handleSetCredentials(username, roomName);
+                notyfRedirecting(500);
                 setAuthorized(true);
-                history.push('/');
-            } else if (result === false) {
-                notyfError('Incorrect passcode', 5000);
-            };
+                setTimeout(() => history.push('/'), 500);
+            } else notyfError('Incorrect passcode', 5000);
         });
     };
 
@@ -43,12 +35,14 @@ const JoinPageRoomPasscode = ({ socket, setAuthorized, handleSetCredentials }) =
                 <form>
                     <label htmlFor='roomPasscode'>Room Passcode</label>
                     <input
-                        type='text'
+                        type='password'
                         name='roomPasscode'
                         id='roomPasscode'
                         value={roomPasscode}
                         onChange={handleOnChangeRoomPasscode}
+                        className={ error && 'has-error' }
                     />
+                    { error && <span className='error-message'>{error}</span> }
                     <button className='join-button' onClick={joinRoom}>
 							Join
 					</button>

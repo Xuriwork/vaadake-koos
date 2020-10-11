@@ -72,6 +72,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on(VERIFY_PASSCODE, ({ roomName, passcode }, callback) => {
+    if (!passcode) return;
+    
     const room = getRoomByName(roomName);
 
     bcrypt.compare(passcode, room.passcode)

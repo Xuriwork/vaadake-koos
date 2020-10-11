@@ -23,7 +23,7 @@ const Header = ({ roomName }) => {
 		roomNameInputRef.current.select();
 		document.execCommand('copy');
 		e.target.focus();
-		notyfSuccess('Copied to clipboard 📋', 2500);
+		notyfSuccess('Copied to room name 📋', 2500);
 	};
 	
 	const updateClipboard = (textToCopy) => {
