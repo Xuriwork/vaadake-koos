@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import io from 'socket.io-client';
 import YouTube from 'react-youtube';
-import { notyfError, notyfSuccess } from '../utils/notyf';
+import { notyfError, notyfSuccess, notyfSyncing } from '../utils/notyf';
 
 import {
 	PLAY,
@@ -21,12 +21,12 @@ import {
 	GET_USERS,
 	NEW_USER_JOINED,
 	SET_HOST,
-	SET_NEW_HOST,
 	NOTIFY_CLIENT_SUCCESS,
 	NOTIFY_CLIENT_ERROR,
 	GET_QUEUE,
 	ADD_TO_QUEUE,
-	REMOVE_FROM_QUEUE
+	REMOVE_FROM_QUEUE,
+	SYNC_BUTTON
 } from '../SocketActions';
 
 import { SettingsContext } from '../context/SettingsContext';
@@ -100,11 +100,12 @@ export class VideoRoom extends Component {
 
 		socket.on(PAUSE, () => player.pauseVideo());
 
-		socket.on(GET_HOST_TIME, () => socket.emit(SYNC_WITH_HOST));
-
-		socket.on(SYNC_WITH_HOST, () => {
-			socket.emit(SYNC_TIME, player.getCurrentTime());
+		socket.on(GET_HOST_TIME, (callback) => {
+			const currentTime = player.getCurrentTime();
+			callback(currentTime);
 		});
+
+		socket.on(SYNC_WITH_HOST, () => socket.emit(SYNC_TIME, player.getCurrentTime()));
 
 		socket.on(SYNC_TIME, (currentTime) => this.syncTime(currentTime));
 
@@ -186,6 +187,12 @@ export class VideoRoom extends Component {
 		socket.emit(VIDEO_CHANGED, videoURL);
 	};
 
+	handleSyncVideo = () => {
+		if (this.state.host === this.state.socket.id) return;
+		notyfSyncing();
+		this.state.socket.emit(SYNC_BUTTON, (time) => this.syncTime(time));
+	};
+
 	handleOnKeyDown = (e) => {
     	if (e.keyCode === 13) this.handleChangeVideo();
 	};
@@ -213,8 +220,6 @@ export class VideoRoom extends Component {
 
 	addToQueue = (video) => this.state.socket.emit(ADD_TO_QUEUE, video);
 	removeFromQueue = (videoId) => this.state.socket.emit(REMOVE_FROM_QUEUE, videoId);
-
-	handleSetNewHost = (userId) => this.state.socket.emit(SET_NEW_HOST, userId);
 
 	onStateChanged = () => {
 		const { player, socket } = this.state;
@@ -255,7 +260,7 @@ export class VideoRoom extends Component {
 				<div className='video-room-page'>
 					<div className='video-and-current-tab-container'>
 						<div
-							className='video-and-input-container'
+							className='video-and-inputs-container'
 							data-chatishidden={this.context.tabContentHidden}
 						>
 							<div className='embed-responsive embed-responsive-16by9'>
@@ -268,7 +273,26 @@ export class VideoRoom extends Component {
 									className='embed-responsive'
 								/>
 							</div>
-							<div className='change-video-input-container'>
+							<div className='change-video-and-sync-container'>
+								{this.state.host !== this.state.socket?.id && (
+									<button
+										className='sync-button'
+										onClick={this.handleSyncVideo}
+									>
+										<svg
+											xmlns='http://www.w3.org/2000/svg'
+											viewBox='0 0 24 24'
+											width='24'
+											height='24'
+										>
+											<path fill='none' d='M0 0h24v24H0z' />
+											<path
+												d='M5.463 4.433A9.961 9.961 0 0 1 12 2c5.523 0 10 4.477 10 10 0 2.136-.67 4.116-1.81 5.74L17 12h3A8 8 0 0 0 6.46 6.228l-.997-1.795zm13.074 15.134A9.961 9.961 0 0 1 12 22C6.477 22 2 17.523 2 12c0-2.136.67-4.116 1.81-5.74L7 12H4a8 8 0 0 0 13.54 5.772l.997 1.795z'
+												fill='rgba(255,255,255,1)'
+											/>
+										</svg>
+									</button>
+								)}
 								<input
 									type='text'
 									placeholder='Enter YouTube Video URL'
@@ -289,7 +313,6 @@ export class VideoRoom extends Component {
 								socket={socket}
 								sendMessage={this.sendMessage}
 								host={host}
-								handleSetNewHost={this.handleSetNewHost}
 								queue={queue}
 								removeFromQueue={this.removeFromQueue}
 								addToQueue={this.addToQueue}

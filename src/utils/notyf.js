@@ -12,6 +12,14 @@ const notyf = new Notyf({
 			background: '#364f6b',
 			icon: false,
 			dismissible: false,
+		},
+		{
+			type: 'syncing',
+			background: '#49beb7',
+			icon: {
+				tagName: 'i',
+				className: 'notyf__icon--syncing',
+			}
 		}
 	]
 });
@@ -19,3 +27,4 @@ const notyf = new Notyf({
 export const notyfError = (message, duration) => notyf.error({ message, duration });
 export const notyfSuccess = (message, duration) => notyf.success({ message, duration });
 export const notyfRedirecting = (duration) => notyf.open({ type: 'redirecting', message: 'Redirecting...', duration });
+export const notyfSyncing = () => notyf.open({ type: 'syncing', message: 'Syncing...', duration: 2000 });

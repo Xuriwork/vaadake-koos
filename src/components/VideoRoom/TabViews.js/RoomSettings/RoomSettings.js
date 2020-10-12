@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { SET_MAX_ROOM_SIZE, SET_ROOM_PASSCODE } from '../../../../SocketActions';
+import { SET_MAX_ROOM_SIZE, SET_ROOM_PASSCODE, SET_NEW_HOST } from '../../../../SocketActions';
 import Modal from './UserActionsModal';
 import { SheildIcon } from './SheildIcon';
 import { validatePasscode } from '../../../../utils/validators';
 import { notyfError } from '../../../../utils/notyf';
 
-const RoomSettings = ({ socket, host, users, handleSetNewHost }) => {
+const RoomSettings = ({ socket, host, users }) => {
     const [roomPasscode, setRoomPasscode] = useState('');
 	const [maxRoomSize, setMaxRoomSize] = useState(20);
 	const [userActionModal, setUserActionModal] = useState(null);
@@ -27,6 +27,8 @@ const RoomSettings = ({ socket, host, users, handleSetNewHost }) => {
 			socket.emit(SET_MAX_ROOM_SIZE, (maxRoomSize * 1));
 		};
 	};
+
+	const handleSetNewHost = (userId) => socket.emit(SET_NEW_HOST, userId);
 	
 	const filteredUsers = users.filter((user) => user.id !== host);
 	const currentHost = users.filter((user) => user.id === host)[0];

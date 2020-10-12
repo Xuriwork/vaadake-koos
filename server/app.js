@@ -35,7 +35,8 @@ const {
   GET_USERS,
   SET_MAX_ROOM_SIZE,
   CHECK_IF_ROOM_IS_FULL,
-  GET_SHORT_URL
+  GET_SHORT_URL,
+  SYNC_BUTTON
 } = require('./SocketActions');
 
 const PORT = process.env.PORT || 5000;
@@ -150,12 +151,14 @@ io.on('connection', (socket) => {
     socket.to(user.roomName).emit(PAUSE);    
   });
 
+  socket.on(SYNC_BUTTON, (callback) => {
+    const room = getRoomByName(socket.roomName);
+    io.sockets.connected[room.host].emit(GET_HOST_TIME, (time) => callback(time));
+  });
+
   socket.on(SYNC_WITH_HOST, () => {
     const room = getRoomByName(socket.roomName);
-
-    if (socket.id !== room.host) {
-      socket.broadcast.emit(GET_HOST_TIME);
-    } else socket.emit(SYNC_WITH_HOST);
+    io.sockets.connected[room.host].emit(SYNC_WITH_HOST);
   });
 
   socket.on(SYNC_TIME, (currentTime) => {
