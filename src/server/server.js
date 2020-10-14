@@ -6,7 +6,8 @@ const bcrypt = require('bcrypt');
 const shortid = require('shortid');
 
 const { addUser, removeUser, getUser, getAllUsersInRoom } = require('./actions/userActions');
-const { addRoom, removeRoom, getRoomByName, getRoomByRoomCode } = require('./actions/roomActions');
+const { addRoom, removeRoom, getRoomByName, getRoomByRoomId } = require('./actions/roomActions');
+const { isEmpty, validatePasscode, validateMaxRoomSize, validateRoomId } = require('./validators');
 
 const {
   CHECK_IF_ROOM_REQUIRES_PASSCODE,
@@ -84,8 +85,8 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on(GET_SHORT_URL, (roomCode, callback) => {
-    const room = getRoomByRoomCode(roomCode);
+  socket.on(GET_SHORT_URL, (roomId, callback) => {
+    const room = getRoomByRoomId(roomId);
 
     if (room && room.name) return callback(true, room.name);
     callback(false, null);
@@ -98,27 +99,31 @@ io.on('connection', (socket) => {
 
     socket.leaveAll();
     socket.join(user.roomName);
+    
     socket.roomName = user.roomName;
     
     io.in(user.roomName).emit(MESSAGE, {
-      type: 'SERVER_USER-JOINED',
+      type: 'SERVER-USER_JOINED',
       content: `${user.username} joined the room. 👋`
     });
     
     socket.to(user.roomName).emit(NEW_USER_JOINED);
     
     const users = getAllUsersInRoom(user.roomName);
-    if (!room) addRoom({ name: user.roomName, host: users[0].id, roomCode: shortid.generate() });
+    if (!room) addRoom({ name: user.roomName, host: users[0].id, roomId: shortid.generate() });
 
     const { host } = getRoomByName(user.roomName);
 
     socket.emit(SET_HOST, host);
     io.in(user.roomName).emit(GET_USERS, users);
+
+    const { maxRoomSize, roomId } = getRoomByName(socket.roomName);
+    io.in(user.roomName).emit('GET_ROOM_INFO', { maxRoomSize, roomId });
   });
 
   socket.on(GET_ROOM_CODE, () => {
     const room = getRoomByName(socket.roomName);
-    socket.emit(GET_ROOM_CODE, room.roomCode);
+    socket.emit(GET_ROOM_CODE, room.roomId);
   });
 
   socket.on(SET_NEW_HOST, (newHost) => {
@@ -221,6 +226,30 @@ io.on('connection', (socket) => {
     });
   });
 
+  socket.on('CHANGE_ROOM_ID', (newId, callback) => {
+    const room = getRoomByName(socket.roomName);
+    if (socket.id !== room.host) return;
+
+    const id = getRoomByRoomId(newId);
+
+    if (isEmpty(newId)) {
+      callback(false, 'Cannot update with an empty field');
+    } else if (!/^[a-zA-Z0-9_-]*$/.test(newId)) {
+      callback(false, 'Only alphanumeric characters');
+    } else if (newId.length < 5) {
+      callback(false, 'The minimum character length is 5');
+    } else if (newId.length > 50) {
+      callback(false, 'The maximum character length is 50');
+    } else if (id) {
+      callback(false, 'Room Id already exists');
+    } else {
+      room.id = newId;
+      callback(true, 'Room Id successfully changed');
+    };
+
+    io.in(room.name).emit('GET_ROOM_INFO', { maxRoomSize: room.maxRoomSize, roomId: room.roomId });
+  });
+
   socket.on(SET_ROOM_PASSCODE, (passcode) => {
     const room = getRoomByName(socket.roomName);
     if (socket.id !== room.host) return;
@@ -230,23 +259,29 @@ io.on('connection', (socket) => {
     };
     
     bcrypt.hash(passcode, 10)
-    .then((hash) => room.passcode = hash)
+    .then((hash) => {
+      room.passcode = hash;
+      sendClientSuccessNotification('Passcode successfully set');
+    })
     .catch((error) => console.error('Error generating a hash: ', error));
   });
 
   socket.on(SET_MAX_ROOM_SIZE, (newMaxRoomSize) => {
     const room = getRoomByName(socket.roomName);
+    const users = getAllUsersInRoom(socket.roomName);
     if (socket.id !== room.host) return;
 
     if (newMaxRoomSize > 20) {
       return sendClientUnsuccessNotification('Max room size must be under 20.');
     };
 
-    if (newMaxRoomSize < room.numberOfUsers) {
+    if (newMaxRoomSize < users.length) {
      return sendClientUnsuccessNotification('The number of current users is too high.', false);
     };
     
     room.maxRoomSize = newMaxRoomSize;
+    console.log(room.maxRoomSize, newMaxRoomSize)
+    io.in(room.name).emit('GET_ROOM_INFO', { maxRoomSize: room.maxRoomSize, roomId: room.roomId });
     sendClientSuccessNotification('Room settings saved successfully');
   });
 

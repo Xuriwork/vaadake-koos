@@ -9,6 +9,7 @@ const CurrentTab = ({
 	messages,
 	users,
 	socket,
+	room,
 	host,
 	sendMessage,
 	handleSetNewHost,
@@ -52,6 +53,7 @@ const CurrentTab = ({
 				<RoomSettings
 					socket={socket}
 					host={host}
+					room={room}
 					users={users}
 					handleSetNewHost={handleSetNewHost}
 				/>

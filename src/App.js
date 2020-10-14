@@ -43,7 +43,7 @@ const App = () => {
 							)}
 						/>
 						<Route
-							path='/invite/:roomCode'
+							path='/invite/:roomId'
 							component={() => <InvitedPage socket={socket} />}
 						/>
 						<Route

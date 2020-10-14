@@ -5,11 +5,11 @@ import { GET_SHORT_URL } from '../SocketActions';
 import { notyfError } from '../utils/notyf';
 
 const InvitedPage = ({ socket }) => {
-    const { roomCode } = useParams();
+    const { roomId } = useParams();
     const history = useHistory();
 
     useEffect(() => {
-        socket.emit(GET_SHORT_URL, roomCode, (result, roomName) => {
+        socket.emit(GET_SHORT_URL, roomId, (result, roomName) => {
             if (result) {
                 history.push('/join', { roomName });
             } else if (!result) {
@@ -17,7 +17,7 @@ const InvitedPage = ({ socket }) => {
                 notyfError('Invalid invite link', 2500);
             };
         });
-    }, [roomCode, socket, history]);
+    }, [roomId, socket, history]);
 
     return <Redirecting />;
 }

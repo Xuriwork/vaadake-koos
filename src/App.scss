@@ -986,13 +986,13 @@ input {
 		}
 	}
 
-	.SERVER_USER-JOINED {
+	.SERVER-USER_JOINED {
 		@extend %SERVER_MESSAGE;
 		color: #23da90;
 		background-color: #41e0a152;
 	}
 
-	.SERVER_USER-LEFT {
+	.SERVER-USER_LEFT {
 		@extend %SERVER_MESSAGE;
 		color: #833c34;
 		background-color: #f58c7e;

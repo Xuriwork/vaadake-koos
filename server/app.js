@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt');
 const shortid = require('shortid');
 
 const { addUser, removeUser, getUser, getAllUsersInRoom } = require('./actions/userActions');
-const { addRoom, removeRoom, getRoomByName, getRoomByRoomCode } = require('./actions/roomActions');
+const { addRoom, removeRoom, getRoomByName, getRoomByRoomId } = require('./actions/roomActions');
 
 const {
   CHECK_IF_ROOM_REQUIRES_PASSCODE,
@@ -84,8 +84,8 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on(GET_SHORT_URL, (roomCode, callback) => {
-    const room = getRoomByRoomCode(roomCode);
+  socket.on(GET_SHORT_URL, (roomId, callback) => {
+    const room = getRoomByRoomId(roomId);
 
     if (room && room.name) return callback(true, room.name);
     callback(false, null);
@@ -108,7 +108,7 @@ io.on('connection', (socket) => {
     socket.to(user.roomName).emit(NEW_USER_JOINED);
     
     const users = getAllUsersInRoom(user.roomName);
-    if (!room) addRoom({ name: user.roomName, host: users[0].id, roomCode: shortid.generate() });
+    if (!room) addRoom({ name: user.roomName, host: users[0].id, roomId: shortid.generate() });
 
     const { host } = getRoomByName(user.roomName);
 
@@ -118,7 +118,7 @@ io.on('connection', (socket) => {
 
   socket.on(GET_ROOM_CODE, () => {
     const room = getRoomByName(socket.roomName);
-    socket.emit(GET_ROOM_CODE, room.roomCode);
+    socket.emit(GET_ROOM_CODE, room.roomId);
   });
 
   socket.on(SET_NEW_HOST, (newHost) => {

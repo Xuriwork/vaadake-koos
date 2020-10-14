@@ -70,18 +70,18 @@ const Chat = ({ messages, sendMessage, users, socket, host }) => {
 					{messages.map(({ type, content, username, id }, index) => (
 						<div
 							className={
-								type === 'SERVER_USER-JOINED'
-									? 'SERVER_USER-JOINED message'
-									: type === 'SERVER_USER-LEFT'
-									? 'SERVER_USER-LEFT message'
+								type === 'SERVER-USER_JOINED'
+									? 'SERVER-USER_JOINED message'
+									: type === 'SERVER-USER_LEFT'
+									? 'SERVER-USER_LEFT message'
 									: type === 'NEW_HOST'
 									? 'NEW_HOST message'
 									: 'message'
 							}
 							key={index}
 						>
-							{type === 'SERVER_USER-JOINED' ||
-							type === 'SERVER_USER-LEFT' ||
+							{type === 'SERVER-USER_JOINED' ||
+							type === 'SERVER-USER_LEFT' ||
 							type === 'NEW_HOST' ? null : (
 								<h4 className='message-author' data-you={id === socket.id}>
 									{username}

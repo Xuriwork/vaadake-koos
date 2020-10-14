@@ -55,6 +55,7 @@ export class VideoRoom extends Component {
 	state = {
 		socket: null,
 		player: null,
+		room: {},
 		users: [],
 		messages: [],
 		host: null,
@@ -92,7 +93,7 @@ export class VideoRoom extends Component {
 		socket.on(NOTIFY_CLIENT_ERROR, (message) => notyfError(message, 5000));
 		socket.on(NOTIFY_CLIENT_SUCCESS, (message) => notyfSuccess(message, 5000));
 
-		socket.on(GET_ROOM_CODE, (roomCode) => history.replace('/', { roomCode }));
+		socket.on(GET_ROOM_CODE, (roomId) => history.replace('/', { roomId }));
 
 		socket.on(NEW_USER_JOINED, () => this.context.playUserJoinedSound());
 
@@ -127,13 +128,15 @@ export class VideoRoom extends Component {
 
 		socket.on(SYNC_VIDEO_INFORMATION, (data) => this.syncTime(data.currentTime));
 
-		socket.on(MESSAGE, (data) => this.getMessages(data));
+		socket.on(MESSAGE, (data) => this.setMessages(data));
 
 		socket.on(GET_USERS, (users) => this.setState({ users }));
 
 		socket.on(SET_HOST, (host) => this.setState({ host }));
 
 		socket.on(GET_QUEUE, (queue) => this.setState({ queue }));
+
+		socket.on('GET_ROOM_INFO', (room) => this.setState({ room }));
 	};
 
 	onReady = (e) => {
@@ -192,7 +195,7 @@ export class VideoRoom extends Component {
     	if (e.keyCode === 13) this.handleChangeVideo();
 	};
 
-	getMessages = (data) => {
+	setMessages = (data) => {
 		this.setState({
 			messages: [
 				...this.state.messages,
@@ -246,7 +249,7 @@ export class VideoRoom extends Component {
 	
 	render() {	
 		
-		const { loading, messages, users, socket, host, tab, queue, videoURL } = this.state;
+		const { loading, messages, socket, users, room, host, tab, queue, videoURL } = this.state;
 
 		return (
 			<>
@@ -305,6 +308,7 @@ export class VideoRoom extends Component {
 								setTab={this.setTab}
 								messages={messages}
 								users={users}
+								room={room}
 								socket={socket}
 								sendMessage={this.sendMessage}
 								host={host}
