@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { SET_MAX_ROOM_SIZE, SET_ROOM_PASSCODE, SET_NEW_HOST } from '../../../../SocketActions';
+import { useLocation, useHistory } from 'react-router-dom';
+import { SET_MAX_ROOM_SIZE, SET_ROOM_PASSCODE, SET_NEW_HOST, CHANGE_ROOM_ID } from '../../../../SocketActions';
 import Modal from './UserActionsModal';
 import { validateSettings } from '../../../../utils/validators';
 import { notyfError, notyfSuccess } from '../../../../utils/notyf';
@@ -8,6 +8,7 @@ import { SheildIcon } from './SheildIcon';
 
 const RoomSettings = ({ socket, host, users, room }) => {
 	const location = useLocation();
+	const history = useHistory();
 
 	const [roomId, setMaxRoomId] = useState(location.state.roomId);
     const [roomPasscode, setRoomPasscode] = useState('');
@@ -34,9 +35,11 @@ const RoomSettings = ({ socket, host, users, room }) => {
 			const { valid, errors } = validateSettings({ roomId });
 			if (!valid) return setErrors(errors);
 
-			socket.emit('CHANGE_ROOM_ID', roomId, (result, payload) => {
-				if (result) notyfSuccess(payload, 2000);
-				else if (!result) notyfError(payload, 2000);
+			socket.emit(CHANGE_ROOM_ID, roomId, (result, payload) => {
+				if (result) {
+					history.replace('/', { roomId })
+					notyfSuccess(payload, 2000);
+				} else if (!result) notyfError(payload, 2000);
 			});
 		};
 

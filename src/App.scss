@@ -228,6 +228,10 @@ input {
 	}
 }
 
+.error-message {
+	color: #ff3838;
+}
+
 .header {
 	background-color: var(--header-background);
 	height: 70px;
@@ -702,10 +706,6 @@ input {
 				background-image: var(--gradient-button);
 				color: #ffffff;
 				font-size: 0.95em;
-			}
-
-			.error-message {
-				color: #ff3838;
 			}
 		}
 	}

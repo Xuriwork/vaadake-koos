@@ -14,6 +14,7 @@ const {
   GET_ROOM_CODE,
   VERIFY_PASSCODE,
   SET_ROOM_PASSCODE,
+  CHANGE_ROOM_ID,
 	PLAY,
   JOIN,
 	PAUSE,
@@ -37,7 +38,7 @@ const {
   SET_MAX_ROOM_SIZE,
   CHECK_IF_ROOM_IS_FULL,
   GET_SHORT_URL,
-  SYNC_BUTTON
+  SYNC_BUTTON,
 } = require('../SocketActions');
 
 const PORT = process.env.PORT || 5000;
@@ -226,11 +227,11 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on('CHANGE_ROOM_ID', (newRoomId, callback) => {
+  socket.on(CHANGE_ROOM_ID, (newRoomId, callback) => {
     const room = getRoomByName(socket.roomName);
     if (socket.id !== room.host) return;
 
-    const { valid, error } = validateRoomId({ roomId: newRoomId });
+    const { valid, error } = validateRoomId(newRoomId);
     if (!valid) return sendClientUnsuccessNotification(error);
 
     room.id = newRoomId;
@@ -243,7 +244,7 @@ io.on('connection', (socket) => {
     const room = getRoomByName(socket.roomName);
     if (socket.id !== room.host) return;
 
-    const { valid, error } = validatePasscode({ passcode });
+    const { valid, error } = validatePasscode(passcode);
     if (!valid) return sendClientUnsuccessNotification(error);
 
     if (passcode.length > 50) {
@@ -263,7 +264,7 @@ io.on('connection', (socket) => {
     const users = getAllUsersInRoom(socket.roomName);
     if (socket.id !== room.host) return;
 
-    const { valid, error } = validateMaxRoomSize({ maxRoomSize: newMaxRoomSize, currentNumberOfUsers: users.length });
+    const { valid, error } = validateMaxRoomSize(newMaxRoomSize, users.length);
     if (!valid) return sendClientUnsuccessNotification(error);
 
     room.maxRoomSize = newMaxRoomSize;

@@ -1,6 +1,7 @@
 const { getRoomByRoomId } = require('./actions/roomActions');
 
 const isEmpty = (string) => {
+    console.log(string);
     if (string.trim() === '') return true;
     else return false;
 };
