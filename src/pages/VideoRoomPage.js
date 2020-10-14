@@ -113,6 +113,7 @@ export class VideoRoom extends Component {
 			player.loadVideoById({
 				videoId: this.convertURLToYoutubeVideoId(videoURL)
 			});
+			player.seekTo(0);
 			socket.emit(SYNC_WITH_HOST);
 		});
 
@@ -124,13 +125,7 @@ export class VideoRoom extends Component {
 			socket.emit(SYNC_VIDEO_INFORMATION, data);
 		});
 
-		socket.on(SYNC_VIDEO_INFORMATION, (data) => {
-			const videoId = this.convertURLToYoutubeVideoId(data.videoURL)
-			player.loadVideoById({
-				videoId,
-				startSeconds: data.currentTime
-			});
-		});
+		socket.on(SYNC_VIDEO_INFORMATION, (data) => this.syncTime(data.currentTime));
 
 		socket.on(MESSAGE, (data) => this.getMessages(data));
 

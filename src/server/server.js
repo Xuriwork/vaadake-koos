@@ -112,7 +112,7 @@ io.on('connection', (socket) => {
 
     const { host } = getRoomByName(user.roomName);
 
-    io.in(user.roomName).emit(SET_HOST, host);
+    socket.emit(SET_HOST, host);
     io.in(user.roomName).emit(GET_USERS, users);
   });
 

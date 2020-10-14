@@ -112,7 +112,7 @@ io.on('connection', (socket) => {
 
     const { host } = getRoomByName(user.roomName);
 
-    io.in(user.roomName).emit(SET_HOST, host);
+    socket.emit(SET_HOST, host);
     io.in(user.roomName).emit(GET_USERS, users);
   });
 
@@ -184,8 +184,7 @@ io.on('connection', (socket) => {
       return sendClientUnsuccessNotification('Only the host can change videos 😉');
     };
 
-    const user = getUser(socket.id);
-    io.to(user.roomName).emit(VIDEO_CHANGED, videoURL);
+    io.to(socket.roomName).emit(VIDEO_CHANGED, videoURL);
   });
 
   socket.on(GET_QUEUE, () => {
