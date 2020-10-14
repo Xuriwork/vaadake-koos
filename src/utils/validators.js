@@ -37,8 +37,6 @@ export const validateJoinRoomData = (username, roomName) => {
 export const validateSettings = ({ passcode, maxRoomSize, currentNumberOfUsers, roomId }) => {
     const errors = {};
 
-    console.log(passcode, maxRoomSize, currentNumberOfUsers, roomId);
-
     if (passcode) {
         passcode = passcode.trim();
 

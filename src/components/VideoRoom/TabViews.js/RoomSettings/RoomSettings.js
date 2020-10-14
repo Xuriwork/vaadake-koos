@@ -25,14 +25,12 @@ const RoomSettings = ({ socket, host, users, room }) => {
 	const handleSaveSettings = () => {
 		
 		if (maxRoomSize !== room.maxRoomSize) {
-			console.log('1');
 			const { valid, errors } = validateSettings({ maxRoomSize, currentNumberOfUsers: users.length });
 			if (!valid) return setErrors(errors);
 			socket.emit(SET_MAX_ROOM_SIZE, (maxRoomSize));
 		};
 		
 		if (roomId !== room.roomId) {
-			console.log('2');
 			const { valid, errors } = validateSettings({ roomId });
 			if (!valid) return setErrors(errors);
 
@@ -43,7 +41,6 @@ const RoomSettings = ({ socket, host, users, room }) => {
 		};
 
 		if (roomPasscode) {
-			console.log('3');
 			const { valid, errors } = validateSettings({ passcode: roomPasscode });
 			if (!valid) return setErrors(errors);
 			socket.emit(SET_ROOM_PASSCODE, roomPasscode);

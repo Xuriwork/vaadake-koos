@@ -1,3 +1,5 @@
+const { getRoomByRoomId } = require('./actions/roomActions');
+
 const isEmpty = (string) => {
     if (string.trim() === '') return true;
     else return false;
@@ -34,7 +36,7 @@ const validateMaxRoomSize = (maxRoomSize, currentNumberOfUsers) => {
     } else if (maxRoomSize < 1) {
         error = 'Minimum room size is 1';
     } else if (maxRoomSize > 20) {
-        error = 'Max room size cannot overpass 20.';
+        error = 'Max room size is 20 users';
     };
 
     const valid = error === null ? true : false;
@@ -44,6 +46,8 @@ const validateMaxRoomSize = (maxRoomSize, currentNumberOfUsers) => {
 const validateRoomId = (roomId) => {
     let error = null;
 
+    const checkIfIdExists = getRoomByRoomId(roomId) ? true : false;
+
     if (isEmpty(roomId)) {
         error = 'Cannot update with an empty field';
     } else if (!/^[a-zA-Z0-9_-]*$/.test(roomId)) {
@@ -52,6 +56,8 @@ const validateRoomId = (roomId) => {
         error = 'The minimum character length is 5';
     } else if (roomId.length > 50) {
         error = 'The maximum character length is 50';
+    } else if (checkIfIdExists) {
+        error = 'Room Id already exists';
     };
 
     const valid = error === null ? true : false;

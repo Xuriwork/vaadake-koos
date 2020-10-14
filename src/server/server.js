@@ -7,7 +7,7 @@ const shortid = require('shortid');
 
 const { addUser, removeUser, getUser, getAllUsersInRoom } = require('./actions/userActions');
 const { addRoom, removeRoom, getRoomByName, getRoomByRoomId } = require('./actions/roomActions');
-const { isEmpty, validatePasscode, validateMaxRoomSize, validateRoomId } = require('./validators');
+const { validatePasscode, validateMaxRoomSize, validateRoomId } = require('./validators');
 
 const {
   CHECK_IF_ROOM_REQUIRES_PASSCODE,
@@ -226,26 +226,15 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on('CHANGE_ROOM_ID', (newId, callback) => {
+  socket.on('CHANGE_ROOM_ID', (newRoomId, callback) => {
     const room = getRoomByName(socket.roomName);
     if (socket.id !== room.host) return;
 
-    const id = getRoomByRoomId(newId);
+    const { valid, error } = validateRoomId({ roomId: newRoomId });
+    if (!valid) return sendClientUnsuccessNotification(error);
 
-    if (isEmpty(newId)) {
-      callback(false, 'Cannot update with an empty field');
-    } else if (!/^[a-zA-Z0-9_-]*$/.test(newId)) {
-      callback(false, 'Only alphanumeric characters');
-    } else if (newId.length < 5) {
-      callback(false, 'The minimum character length is 5');
-    } else if (newId.length > 50) {
-      callback(false, 'The maximum character length is 50');
-    } else if (id) {
-      callback(false, 'Room Id already exists');
-    } else {
-      room.id = newId;
-      callback(true, 'Room Id successfully changed');
-    };
+    room.id = newRoomId;
+    callback(true, 'Room Id successfully changed');
 
     io.in(room.name).emit('GET_ROOM_INFO', { maxRoomSize: room.maxRoomSize, roomId: room.roomId });
   });
@@ -253,6 +242,9 @@ io.on('connection', (socket) => {
   socket.on(SET_ROOM_PASSCODE, (passcode) => {
     const room = getRoomByName(socket.roomName);
     if (socket.id !== room.host) return;
+
+    const { valid, error } = validatePasscode({ passcode });
+    if (!valid) return sendClientUnsuccessNotification(error);
 
     if (passcode.length > 50) {
       return sendClientUnsuccessNotification('Room Passcode can only be up to 50 characters');
@@ -271,16 +263,10 @@ io.on('connection', (socket) => {
     const users = getAllUsersInRoom(socket.roomName);
     if (socket.id !== room.host) return;
 
-    if (newMaxRoomSize > 20) {
-      return sendClientUnsuccessNotification('Max room size must be under 20.');
-    };
+    const { valid, error } = validateMaxRoomSize({ maxRoomSize: newMaxRoomSize, currentNumberOfUsers: users.length });
+    if (!valid) return sendClientUnsuccessNotification(error);
 
-    if (newMaxRoomSize < users.length) {
-     return sendClientUnsuccessNotification('The number of current users is too high.', false);
-    };
-    
     room.maxRoomSize = newMaxRoomSize;
-    console.log(room.maxRoomSize, newMaxRoomSize)
     io.in(room.name).emit('GET_ROOM_INFO', { maxRoomSize: room.maxRoomSize, roomId: room.roomId });
     sendClientSuccessNotification('Room settings saved successfully');
   });
