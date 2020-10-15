@@ -81,7 +81,7 @@ export class VideoRoom extends Component {
 
 	onSocketMethods = (socket) => {
 		const { roomName, username, history } = this.props;
-		const { player, queue } = this.state;
+		const { player } = this.state;
 		
 		socket.on('connect', () => {
 			socket.emit(JOIN, { roomName, username });
@@ -102,12 +102,6 @@ export class VideoRoom extends Component {
 		socket.on(PLAY, () => player.playVideo());
 
 		socket.on(PAUSE, () => player.pauseVideo());
-
-		socket.on('PLAY_NEXT', () => {
-			const nextVideo = queue[0].id;
-			socket.emit(CHANGE_VIDEO, nextVideo);
-			this.removeFromQueue(nextVideo);
-		});
 
 		socket.on(GET_HOST_TIME, (callback) => {
 			const currentTime = player.getCurrentTime();
@@ -181,6 +175,12 @@ export class VideoRoom extends Component {
 		}
 	};
 
+	handleSyncVideo = () => {
+		if (this.state.host === this.state.socket.id) return;
+		notyfSyncing();
+		this.state.socket.emit(SYNC_BUTTON, (time) => this.syncTime(time));
+	};
+
 	handleOnChangeVideoURL = (e) => this.setState({ videoURL: e.target.value });
 
 	handleChangeVideo = () => {
@@ -191,12 +191,6 @@ export class VideoRoom extends Component {
 		};
 		
 		socket.emit(CHANGE_VIDEO, videoURL);
-	};
-
-	handleSyncVideo = () => {
-		if (this.state.host === this.state.socket.id) return;
-		notyfSyncing();
-		this.state.socket.emit(SYNC_BUTTON, (time) => this.syncTime(time));
 	};
 
 	handleOnKeyDown = (e) => {
@@ -227,6 +221,13 @@ export class VideoRoom extends Component {
 	addToQueue = (video) => this.state.socket.emit(ADD_TO_QUEUE, video);
 	removeFromQueue = (videoId) => this.state.socket.emit(REMOVE_FROM_QUEUE, videoId);
 
+	playNextInQueue = () => {
+		const { queue, socket } = this.state;
+		const nextVideo = queue[0].id;
+		socket.emit(CHANGE_VIDEO, nextVideo);
+		this.removeFromQueue(nextVideo);
+	};
+
 	onStateChanged = () => {
 		const { player, socket, queue } = this.state;
 
@@ -235,8 +236,9 @@ export class VideoRoom extends Component {
 			socket.emit(PLAY);
 			break;
 		  case 0:
+			console.log(queue);
 			if (queue.length > 0) {
-				socket.emit('PLAY_NEXT');
+				this.playNextInQueue();
 			};
 			break;
 		  case 1:
