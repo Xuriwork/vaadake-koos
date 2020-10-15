@@ -80,7 +80,7 @@ export class VideoRoom extends Component {
 
 	onSocketMethods = (socket) => {
 		const { roomName, username, history } = this.props;
-		const { player } = this.state;
+		const { player, queue } = this.state;
 		
 		socket.on('connect', () => {
 			socket.emit(JOIN, { roomName, username });
@@ -101,6 +101,12 @@ export class VideoRoom extends Component {
 		socket.on(PLAY, () => player.playVideo());
 
 		socket.on(PAUSE, () => player.pauseVideo());
+
+		socket.on('PLAY_NEXT', () => {
+			const nextVideo = queue[0].id;
+			socket.emit(VIDEO_CHANGED, nextVideo);
+			this.removeFromQueue(nextVideo);
+		});
 
 		socket.on(GET_HOST_TIME, (callback) => {
 			const currentTime = player.getCurrentTime();
@@ -221,13 +227,16 @@ export class VideoRoom extends Component {
 	removeFromQueue = (videoId) => this.state.socket.emit(REMOVE_FROM_QUEUE, videoId);
 
 	onStateChanged = () => {
-		const { player, socket } = this.state;
+		const { player, socket, queue } = this.state;
 
 		switch (player.getPlayerState()) {
 		  case -1:
 			socket.emit(PLAY);
 			break;
 		  case 0:
+			if (queue.length > 0) {
+				socket.emit('PLAY_NEXT');
+			};
 			break;
 		  case 1:
 			socket.emit(SYNC_WITH_HOST);
@@ -247,6 +256,7 @@ export class VideoRoom extends Component {
 	};
 
 	setTab = (tab) => this.setState({ tab });
+	setQueue = (queue) => this.setState({ queue });
 	
 	render() {	
 		
@@ -317,6 +327,7 @@ export class VideoRoom extends Component {
 								removeFromQueue={this.removeFromQueue}
 								addToQueue={this.addToQueue}
 								handleChangeVideo={this.handleChangeVideo}
+								setQueue={this.setQueue}
 							/>
 						)}
 					</div>

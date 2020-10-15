@@ -2,11 +2,51 @@
 import React, { useState } from 'react';
 import { notyfError } from '../../../../utils/notyf';
 import { TrashIcon, PlayVideoIcon } from './QueueIcons';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 const YOUTUBE_API_KEY = process.env.REACT_APP_YOUTUBE_API_KEY;
 const URL_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)/;
 
-const Queue = ({ queue, addToQueue, removeFromQueue, handleChangeVideo, setTab }) => {
+const QueueItem = ({ id, title, thumbnail, index, playVideo, removeVideoFromQueue }) => (
+	<Draggable draggableId={id} index={index}>
+		{provided => (
+			<li 
+				ref={provided.innerRef}
+          		{...provided.draggableProps}
+          		{...provided.dragHandleProps}
+			>
+				<img src={thumbnail} alt={title} />
+				<span>
+					<button onClick={() => removeVideoFromQueue(id)}>
+						<TrashIcon />
+					</button>
+					<button onClick={() => playVideo(id)}>
+						<PlayVideoIcon />
+					</button>
+				</span>
+				<h3>{title.substring(0, 75)}</h3>
+			</li>
+		)}
+	</Draggable>
+);
+
+const QueueList = ({ queue, playVideo, removeVideoFromQueue }) => (
+	<ul className='video-queue'>
+		{queue.map((video, index) => (
+			<QueueItem 
+				key={video.id}
+				id={video.id}
+				title={video.title}
+				thumbnail={video.thumbnail}
+				index={index}
+				removeVideoFromQueue={removeVideoFromQueue}
+				playVideo={playVideo}
+			/>
+		))}
+	</ul>
+);
+
+const Queue = ({ queue, addToQueue, removeFromQueue, handleChangeVideo, setQueue }) => {
 	const [videoURL, setVideoURL] = useState('');
 
 	const convertURLToYoutubeVideoId = (url) => {
@@ -58,6 +98,31 @@ const Queue = ({ queue, addToQueue, removeFromQueue, handleChangeVideo, setTab }
 
 	const handleOnChange = (e) => setVideoURL(e.target.value);
 
+	const reorder = (list, startIndex, endIndex) => {
+		const result = Array.from(list);
+		const [removed] = result.splice(startIndex, 1);
+		result.splice(endIndex, 0, removed);
+	  
+		return result;
+	};
+
+	const onDragEnd = (result) => {
+
+		if (!result.destination) return;
+	
+		if (result.destination.index === result.source.index) {
+		  return;
+		};
+	
+		const newQueue = reorder(
+			queue,
+			result.source.index,
+			result.destination.index
+		);
+	
+		setQueue(newQueue);
+	};
+
     return (
 			<>
 				<h2>Queue</h2>
@@ -72,22 +137,20 @@ const Queue = ({ queue, addToQueue, removeFromQueue, handleChangeVideo, setTab }
 					/>
 					<button onClick={handleAddVideoToQueue}>Add Video</button>
 				</div>
-				<ul className='video-queue'>
-					{queue.map((video) => (
-						<li key={video.id}>
-							<img src={video.thumbnail} alt={video.title} />
-							<span>
-								<button onClick={() => removeVideoFromQueue(video.id)}>
-									<TrashIcon />
-								</button>
-								<button onClick={() => playVideo(video.id)}>
-									<PlayVideoIcon />
-								</button>
-							</span>
-							<h3>{video.title.substring(0, 75)}</h3>
-						</li>
-					))}
-				</ul>
+				<DragDropContext onDragEnd={onDragEnd}>
+					<Droppable droppableId='list'>
+						{(provided) => (
+							<div className='video-queue-container' ref={provided.innerRef} {...provided.droppableProps}>
+								<QueueList
+									queue={queue}
+									playVideo={playVideo}
+									removeVideoFromQueue={removeVideoFromQueue}
+								/>
+								{provided.placeholder}
+							</div>
+						)}
+					</Droppable>
+				</DragDropContext>
 			</>
 		);
 }

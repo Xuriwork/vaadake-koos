@@ -1027,9 +1027,26 @@ input {
 	}
 }
 
+.video-queue-container {
+	height: 100%;
+	max-height: 100%;
+	overflow-y: auto;
+
+	&::-webkit-scrollbar {
+		width: 4px;
+		background-color: #e0e0e0;
+		border-radius: 5px;
+	}
+
+	&::-webkit-scrollbar-thumb {
+		background-color: var(--theme-color);
+		background-image: var(--gradient-button-180deg);
+		border-radius: 5px;
+	}
+}
+
 .video-queue {
 	border-radius: 5px;
-	overflow-y: auto;
 	background-color: var(--tab-content-background);
 	height: 100%;
 	max-width: 300px;
@@ -1086,18 +1103,6 @@ input {
 		&:not(:last-of-type) {
 			margin-bottom: 10px;
 		}
-	}
-
-	&::-webkit-scrollbar {
-		width: 4px;
-		background-color: #e0e0e0;
-		border-radius: 5px;
-	}
-
-	&::-webkit-scrollbar-thumb {
-		background-color: var(--theme-color);
-		background-image: var(--gradient-button-180deg);
-		border-radius: 5px;
 	}
 }
 

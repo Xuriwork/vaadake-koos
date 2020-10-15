@@ -208,11 +208,11 @@ io.on('connection', (socket) => {
     io.to(socket.roomName).emit(GET_QUEUE, room.queue);
   });
 
-  socket.on(REMOVE_FROM_QUEUE, (data) => {
+  socket.on(REMOVE_FROM_QUEUE, (videoToRemove) => {
     const room = getRoomByName(socket.roomName);
     const queue = room.queue;
 
-    const index = queue.findIndex((video) => video.id === data);
+    const index = queue.findIndex((video) => video.id === videoToRemove);
     if (index !== -1) queue.splice(index, 1);
 
     io.to(socket.roomName).emit(GET_QUEUE, queue);

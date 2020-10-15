@@ -16,7 +16,8 @@ const CurrentTab = ({
 	queue,
 	addToQueue,
 	removeFromQueue,
-	handleChangeVideo
+	handleChangeVideo,
+	setQueue
 }) => {
 
 	const handleSetToChatView = () => setTab('chat');
@@ -45,6 +46,7 @@ const CurrentTab = ({
 				<Queue
 					queue={queue}
 					addToQueue={addToQueue}
+					setQueue={setQueue}
 					removeFromQueue={removeFromQueue}
 					handleChangeVideo={handleChangeVideo}
 				/>
