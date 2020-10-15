@@ -1,50 +1,11 @@
 /* eslint-disable no-useless-escape */
 import React, { useState } from 'react';
 import { notyfError } from '../../../../utils/notyf';
-import { TrashIcon, PlayVideoIcon } from './QueueIcons';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import QueueList from './QueueList';
 
 const YOUTUBE_API_KEY = process.env.REACT_APP_YOUTUBE_API_KEY;
 const URL_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)/;
-
-const QueueItem = ({ id, title, thumbnail, index, playVideo, removeVideoFromQueue }) => (
-	<Draggable draggableId={id} index={index}>
-		{provided => (
-			<li 
-				ref={provided.innerRef}
-          		{...provided.draggableProps}
-          		{...provided.dragHandleProps}
-			>
-				<img src={thumbnail} alt={title} />
-				<span>
-					<button onClick={() => removeVideoFromQueue(id)}>
-						<TrashIcon />
-					</button>
-					<button onClick={() => playVideo(id)}>
-						<PlayVideoIcon />
-					</button>
-				</span>
-				<h3>{title.substring(0, 75)}</h3>
-			</li>
-		)}
-	</Draggable>
-);
-
-const QueueList = ({ queue, playVideo, removeVideoFromQueue }) => (
-	<ul className='video-queue'>
-		{queue.map((video, index) => (
-			<QueueItem 
-				key={video.id}
-				id={video.id}
-				title={video.title}
-				thumbnail={video.thumbnail}
-				index={index}
-				removeVideoFromQueue={removeVideoFromQueue}
-				playVideo={playVideo}
-			/>
-		))}
-	</ul>
-);
 
 const Queue = ({ queue, addToQueue, removeFromQueue, handleChangeVideo, setQueue }) => {
 	const [videoURL, setVideoURL] = useState('');
