@@ -1,9 +1,11 @@
 const express = require('express');
+const cors = require('cors');
+const bcrypt = require('bcrypt');
+const shortid = require('shortid');
+
 const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
-const bcrypt = require('bcrypt');
-const shortid = require('shortid');
 
 const { addUser, removeUser, getUser, getAllUsersInRoom } = require('./actions/userActions');
 const { addRoom, removeRoom, getRoomByName, getRoomByRoomId } = require('./actions/roomActions');
@@ -19,7 +21,7 @@ const {
   JOIN,
 	PAUSE,
 	SYNC_TIME,
-	VIDEO_CHANGED,
+	CHANGE_VIDEO,
 	GET_VIDEO_INFORMATION,
   SYNC_VIDEO_INFORMATION,
   GET_HOST_TIME,
@@ -39,11 +41,24 @@ const {
   CHECK_IF_ROOM_IS_FULL,
   GET_SHORT_URL,
   SYNC_BUTTON,
+  QUEUE_REORDERED,
 } = require('../SocketActions');
 
 const PORT = process.env.PORT || 5000;
 
+const origins = ['https://vaadakekoos.web.app', 'vaadakekoos.firebaseapp.com'];
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (origins.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
+};
+
 app.use(express.static(__dirname + '/../../build'));
+app.use(cors(corsOptions));
 
 io.on('connection', (socket) => {
 
@@ -182,7 +197,7 @@ io.on('connection', (socket) => {
     socket.to(user.roomName).emit(GET_VIDEO_INFORMATION);
   });
 
-  socket.on(VIDEO_CHANGED, (videoURL) => {
+  socket.on(CHANGE_VIDEO, (videoURL) => {
 
     const room = getRoomByName(socket.roomName);
 
@@ -190,7 +205,7 @@ io.on('connection', (socket) => {
       return sendClientUnsuccessNotification('Only the host can change videos 😉');
     };
 
-    io.to(socket.roomName).emit(VIDEO_CHANGED, videoURL);
+    io.to(socket.roomName).emit(CHANGE_VIDEO, videoURL);
   });
 
   socket.on(GET_QUEUE, () => {
@@ -214,6 +229,13 @@ io.on('connection', (socket) => {
 
     const index = queue.findIndex((video) => video.id === videoToRemove);
     if (index !== -1) queue.splice(index, 1);
+
+    io.to(socket.roomName).emit(GET_QUEUE, queue);
+  });
+
+  socket.on(QUEUE_REORDERED, (queue) => {
+    const room = getRoomByName(socket.roomName);
+    if (socket.id !== room.host) return;
 
     io.to(socket.roomName).emit(GET_QUEUE, queue);
   });

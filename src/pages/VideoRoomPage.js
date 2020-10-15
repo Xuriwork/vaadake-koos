@@ -16,7 +16,7 @@ import {
 	GET_HOST_TIME,
 	GET_VIDEO_INFORMATION,
 	SYNC_VIDEO_INFORMATION,
-	VIDEO_CHANGED,
+	CHANGE_VIDEO,
 	SEND_MESSAGE,
 	MESSAGE,
 	GET_USERS,
@@ -27,7 +27,8 @@ import {
 	GET_QUEUE,
 	ADD_TO_QUEUE,
 	REMOVE_FROM_QUEUE,
-	SYNC_BUTTON
+	SYNC_BUTTON,
+	QUEUE_REORDERED
 } from '../SocketActions';
 
 import { SettingsContext } from '../context/SettingsContext';
@@ -104,7 +105,7 @@ export class VideoRoom extends Component {
 
 		socket.on('PLAY_NEXT', () => {
 			const nextVideo = queue[0].id;
-			socket.emit(VIDEO_CHANGED, nextVideo);
+			socket.emit(CHANGE_VIDEO, nextVideo);
 			this.removeFromQueue(nextVideo);
 		});
 
@@ -117,7 +118,7 @@ export class VideoRoom extends Component {
 
 		socket.on(SYNC_TIME, (currentTime) => this.syncTime(currentTime));
 
-		socket.on(VIDEO_CHANGED, (videoURL) => {
+		socket.on(CHANGE_VIDEO, (videoURL) => {
 			player.loadVideoById({
 				videoId: this.convertURLToYoutubeVideoId(videoURL)
 			});
@@ -189,7 +190,7 @@ export class VideoRoom extends Component {
 			return notyfError('Invalid URL', 5000);
 		};
 		
-		socket.emit(VIDEO_CHANGED, videoURL);
+		socket.emit(CHANGE_VIDEO, videoURL);
 	};
 
 	handleSyncVideo = () => {
@@ -256,7 +257,7 @@ export class VideoRoom extends Component {
 	};
 
 	setTab = (tab) => this.setState({ tab });
-	setQueue = (queue) => this.setState({ queue });
+	setQueue = (queue) => this.state.socket.emit(QUEUE_REORDERED, queue);
 	
 	render() {	
 		

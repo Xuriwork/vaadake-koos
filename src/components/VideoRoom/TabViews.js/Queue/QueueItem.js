@@ -2,8 +2,8 @@ import React from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import { PlayVideoIcon, TrashIcon } from './QueueIcons';
 
-export const QueueItem = ({ id, title, thumbnail, index, playVideo, removeVideoFromQueue }) => (
-	<Draggable draggableId={id} index={index}>
+export const QueueItem = ({ id, title, thumbnail, index, playVideo, removeVideoFromQueue, isDisabled }) => (
+	<Draggable draggableId={id} index={index} isDragDisabled={isDisabled}>
 		{provided => (
 			<li 
 				ref={provided.innerRef}

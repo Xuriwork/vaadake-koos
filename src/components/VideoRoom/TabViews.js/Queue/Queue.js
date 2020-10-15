@@ -7,8 +7,9 @@ import QueueList from './QueueList';
 const YOUTUBE_API_KEY = process.env.REACT_APP_YOUTUBE_API_KEY;
 const URL_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)/;
 
-const Queue = ({ queue, addToQueue, removeFromQueue, handleChangeVideo, setQueue }) => {
+const Queue = ({ queue, addToQueue, removeFromQueue, handleChangeVideo, setQueue, host, id }) => {
 	const [videoURL, setVideoURL] = useState('');
+	const isDisabled = host !== id;
 
 	const convertURLToYoutubeVideoId = (url) => {
 		let id = '';
@@ -69,6 +70,8 @@ const Queue = ({ queue, addToQueue, removeFromQueue, handleChangeVideo, setQueue
 
 	const onDragEnd = (result) => {
 
+		if (host !== id) return;
+
 		if (!result.destination) return;
 	
 		if (result.destination.index === result.source.index) {
@@ -99,13 +102,14 @@ const Queue = ({ queue, addToQueue, removeFromQueue, handleChangeVideo, setQueue
 					<button onClick={handleAddVideoToQueue}>Add Video</button>
 				</div>
 				<DragDropContext onDragEnd={onDragEnd}>
-					<Droppable droppableId='list'>
+					<Droppable droppableId='list' isDropDisabled={isDisabled}>
 						{(provided) => (
 							<div className='video-queue-container' ref={provided.innerRef} {...provided.droppableProps}>
 								<QueueList
 									queue={queue}
 									playVideo={playVideo}
 									removeVideoFromQueue={removeVideoFromQueue}
+									isDisabled={isDisabled}
 								/>
 								{provided.placeholder}
 							</div>

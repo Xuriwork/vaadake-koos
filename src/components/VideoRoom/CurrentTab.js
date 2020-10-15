@@ -49,6 +49,8 @@ const CurrentTab = ({
 					setQueue={setQueue}
 					removeFromQueue={removeFromQueue}
 					handleChangeVideo={handleChangeVideo}
+					id={socket.id}
+					host={host}
 				/>
 			)}
 			{tab === 'room-settings' && (
