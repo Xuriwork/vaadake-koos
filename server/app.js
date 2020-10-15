@@ -7,12 +7,14 @@ const shortid = require('shortid');
 
 const { addUser, removeUser, getUser, getAllUsersInRoom } = require('./actions/userActions');
 const { addRoom, removeRoom, getRoomByName, getRoomByRoomId } = require('./actions/roomActions');
+const { validatePasscode, validateMaxRoomSize, validateRoomId } = require('./utils/validators');
 
 const {
   CHECK_IF_ROOM_REQUIRES_PASSCODE,
   GET_ROOM_CODE,
   VERIFY_PASSCODE,
   SET_ROOM_PASSCODE,
+  CHANGE_ROOM_ID,
 	PLAY,
   JOIN,
 	PAUSE,
@@ -36,7 +38,7 @@ const {
   SET_MAX_ROOM_SIZE,
   CHECK_IF_ROOM_IS_FULL,
   GET_SHORT_URL,
-  SYNC_BUTTON
+  SYNC_BUTTON,
 } = require('./SocketActions');
 
 const PORT = process.env.PORT || 5000;
@@ -98,10 +100,11 @@ io.on('connection', (socket) => {
 
     socket.leaveAll();
     socket.join(user.roomName);
+    
     socket.roomName = user.roomName;
     
     io.in(user.roomName).emit(MESSAGE, {
-      type: 'SERVER_USER-JOINED',
+      type: 'SERVER-USER_JOINED',
       content: `${user.username} joined the room. 👋`
     });
     
@@ -114,6 +117,9 @@ io.on('connection', (socket) => {
 
     socket.emit(SET_HOST, host);
     io.in(user.roomName).emit(GET_USERS, users);
+
+    const { maxRoomSize, roomId } = getRoomByName(socket.roomName);
+    io.in(user.roomName).emit('GET_ROOM_INFO', { maxRoomSize, roomId });
   });
 
   socket.on(GET_ROOM_CODE, () => {
@@ -221,32 +227,48 @@ io.on('connection', (socket) => {
     });
   });
 
+  socket.on(CHANGE_ROOM_ID, (newRoomId, callback) => {
+    const room = getRoomByName(socket.roomName);
+    if (socket.id !== room.host) return;
+
+    const { valid, error } = validateRoomId(newRoomId);
+    if (!valid) return sendClientUnsuccessNotification(error);
+
+    room.id = newRoomId;
+    callback(true, 'Room Id successfully changed');
+
+    io.in(room.name).emit('GET_ROOM_INFO', { maxRoomSize: room.maxRoomSize, roomId: room.roomId });
+  });
+
   socket.on(SET_ROOM_PASSCODE, (passcode) => {
     const room = getRoomByName(socket.roomName);
     if (socket.id !== room.host) return;
+
+    const { valid, error } = validatePasscode(passcode);
+    if (!valid) return sendClientUnsuccessNotification(error);
 
     if (passcode.length > 50) {
       return sendClientUnsuccessNotification('Room Passcode can only be up to 50 characters');
     };
     
     bcrypt.hash(passcode, 10)
-    .then((hash) => room.passcode = hash)
+    .then((hash) => {
+      room.passcode = hash;
+      sendClientSuccessNotification('Passcode successfully set');
+    })
     .catch((error) => console.error('Error generating a hash: ', error));
   });
 
   socket.on(SET_MAX_ROOM_SIZE, (newMaxRoomSize) => {
     const room = getRoomByName(socket.roomName);
+    const users = getAllUsersInRoom(socket.roomName);
     if (socket.id !== room.host) return;
 
-    if (newMaxRoomSize > 20) {
-      return sendClientUnsuccessNotification('Max room size must be under 20.');
-    };
+    const { valid, error } = validateMaxRoomSize(newMaxRoomSize, users.length);
+    if (!valid) return sendClientUnsuccessNotification(error);
 
-    if (newMaxRoomSize < room.numberOfUsers) {
-     return sendClientUnsuccessNotification('The number of current users is too high.', false);
-    };
-    
     room.maxRoomSize = newMaxRoomSize;
+    io.in(room.name).emit('GET_ROOM_INFO', { maxRoomSize: room.maxRoomSize, roomId: room.roomId });
     sendClientSuccessNotification('Room settings saved successfully');
   });
 

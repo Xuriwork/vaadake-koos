@@ -7,6 +7,7 @@ import { notyfError, notyfSuccess, notyfSyncing } from '../utils/notyf';
 
 import {
 	PLAY,
+	GET_ROOM_INFO,
 	GET_ROOM_CODE,
 	JOIN,
 	PAUSE,
@@ -136,7 +137,7 @@ export class VideoRoom extends Component {
 
 		socket.on(GET_QUEUE, (queue) => this.setState({ queue }));
 
-		socket.on('GET_ROOM_INFO', (room) => this.setState({ room }));
+		socket.on(GET_ROOM_INFO, (room) => this.setState({ room }));
 	};
 
 	onReady = (e) => {
