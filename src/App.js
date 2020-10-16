@@ -2,17 +2,17 @@ import React, { useState } from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import io from 'socket.io-client';
 
+import { socketURL } from './utils/constants';
+
 import Header from './components/Header/Header';
 import JoinPage from './pages/JoinPage';
 import JoinPageRoomPasscode from './pages/JoinPageRoomPasscode';
 import RoomPage from './pages/VideoRoomPage';
 import NotFoundPage from './pages/NotFoundPage';
+import InvitedPage from './pages/InvitedPage';
 
 import './App.scss';
 import 'notyf/notyf.min.css';
-import InvitedPage from './pages/InvitedPage';
-
-const socketURL = process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : process.env.REACT_APP_GAE_API_URL;
 
 const App = () => {
 	const socket = io(socketURL, {transports: ['websocket']});

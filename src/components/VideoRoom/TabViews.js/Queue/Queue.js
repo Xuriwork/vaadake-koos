@@ -1,34 +1,28 @@
-/* eslint-disable no-useless-escape */
 import React, { useState } from 'react';
-import { notyfError } from '../../../../utils/notyf';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import { notyfError } from '../../../../utils/notyf';
+import { convertURLToYoutubeVideoId, YOUTUBE_VIDEO_URL_REGEX } from '../../../../utils/constants';
 import QueueList from './QueueList';
 
 const YOUTUBE_API_KEY = process.env.REACT_APP_YOUTUBE_API_KEY;
-const URL_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)/;
 
 const Queue = ({ queue, addToQueue, removeFromQueue, handleChangeVideo, setQueue, host, id }) => {
 	const [videoURL, setVideoURL] = useState('');
 	const isDisabled = host !== id;
 
-	const convertURLToYoutubeVideoId = (url) => {
-		let id = '';
-		url = url.replace(/(>|<)/gi,'').split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
-	
-		if(url[2] !== undefined) {
-			id = url[2].split(/[^0-9a-z_-]/i);
-			id = id[0];
-		} else id = url;
-		return id;
-	};
-
     const handleAddVideoToQueue = () => {
 		if (videoURL.trim() === '') return;
-		if (!URL_REGEX.test(videoURL)) {
+		if (!YOUTUBE_VIDEO_URL_REGEX.test(videoURL)) {
 			return notyfError('Invalid URL', 2500);
 		};
 
 		const videoId = convertURLToYoutubeVideoId(videoURL);
+
+		const videoExist = queue.find((video) => video.id === videoId);
+		if (!!videoExist) {
+			setVideoURL('');
+			return notyfError('Video already exists', 2500);
+		};
 
         fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${YOUTUBE_API_KEY}`)
         .then((res) => res.json())

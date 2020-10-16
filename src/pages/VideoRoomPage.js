@@ -1,8 +1,9 @@
-/* eslint-disable no-useless-escape */
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import io from 'socket.io-client';
 import YouTube from 'react-youtube';
+
+import { convertURLToYoutubeVideoId, socketURL, YOUTUBE_VIDEO_URL_REGEX } from '../utils/constants';
 import { notyfError, notyfSuccess, notyfSyncing } from '../utils/notyf';
 
 import {
@@ -35,9 +36,6 @@ import { SettingsContext } from '../context/SettingsContext';
 import Loading from '../components/Loading';
 import Tabs from '../components/VideoRoom/Tabs/Tabs';
 import CurrentTab from '../components/VideoRoom/CurrentTab';
-
-const socketURL = process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : process.env.REACT_APP_GAE_API_URL;
-const YOUTUBE_VIDEO_URL_REGEX = /^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/|\/embed\/.+$/;
 
 const youtubeConfig = {
 	height: '390',
@@ -114,7 +112,7 @@ export class VideoRoom extends Component {
 
 		socket.on(CHANGE_VIDEO, (videoURL) => {
 			player.loadVideoById({
-				videoId: this.convertURLToYoutubeVideoId(videoURL)
+				videoId: convertURLToYoutubeVideoId(videoURL)
 			});
 			player.seekTo(0);
 			socket.emit(SYNC_WITH_HOST);
@@ -149,19 +147,6 @@ export class VideoRoom extends Component {
 	};
 
 	onError = (error) => console.error(error);
-
-	convertURLToYoutubeVideoId = (url) => {
-		let id = '';
-
-		url = url.replace(/(>|<)/gi,'').split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
-
-		if(url[2] !== undefined) {
-			id = url[2].split(/[^0-9a-z_-]/i);
-			id = id[0];
-		} else id = url;
-
-		return id;
-	};
 
 	syncTime = (currentTime) => {
 		const { player } = this.state;
