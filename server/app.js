@@ -60,6 +60,11 @@ const corsOptions = {
 app.use(express.static(__dirname + '/../../build'));
 app.use(cors(corsOptions));
 
+const requestIsNotFromHost = (socket) => {
+  const room = getRoomByName(socket.roomName);
+  return socket.id !== room.host;
+};
+
 io.on('connection', (socket) => {
 
   const sendClientUnsuccessNotification = (message) => {
@@ -157,16 +162,14 @@ io.on('connection', (socket) => {
   });
 
   socket.on(PLAY, () => {
-    const room = getRoomByName(socket.roomName);
-    if (room.host !== socket.id) return;
+    if (requestIsNotFromHost(socket)) return;
 
     const user = getUser(socket.id);
     socket.to(user.roomName).emit(PLAY);
   });
 
   socket.on(PAUSE, () => {
-    const room = getRoomByName(socket.roomName);
-    if (room.host !== socket.id) return;
+    if (requestIsNotFromHost(socket)) return;
 
     const user = getUser(socket.id);
     socket.to(user.roomName).emit(PAUSE);    
@@ -199,9 +202,7 @@ io.on('connection', (socket) => {
 
   socket.on(CHANGE_VIDEO, (videoURL) => {
 
-    const room = getRoomByName(socket.roomName);
-
-    if (socket.id !== room.host) {
+    if (requestIsNotFromHost(socket)) {
       return sendClientUnsuccessNotification('Only the host can change videos 😉');
     };
 
@@ -234,8 +235,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on(QUEUE_REORDERED, (queue) => {
-    const room = getRoomByName(socket.roomName);
-    if (socket.id !== room.host) return;
+    if (requestIsNotFromHost(socket)) return;
 
     io.to(socket.roomName).emit(GET_QUEUE, queue);
   });
@@ -251,7 +251,7 @@ io.on('connection', (socket) => {
 
   socket.on(CHANGE_ROOM_ID, (newRoomId, callback) => {
     const room = getRoomByName(socket.roomName);
-    if (socket.id !== room.host) return;
+    if (requestIsNotFromHost(socket)) return;
 
     const { valid, error } = validateRoomId(newRoomId);
     if (!valid) return sendClientUnsuccessNotification(error);
@@ -264,7 +264,7 @@ io.on('connection', (socket) => {
 
   socket.on(SET_ROOM_PASSCODE, (passcode) => {
     const room = getRoomByName(socket.roomName);
-    if (socket.id !== room.host) return;
+    if (requestIsNotFromHost(socket)) return;
 
     const { valid, error } = validatePasscode(passcode);
     if (!valid) return sendClientUnsuccessNotification(error);
@@ -284,7 +284,7 @@ io.on('connection', (socket) => {
   socket.on(SET_MAX_ROOM_SIZE, (newMaxRoomSize) => {
     const room = getRoomByName(socket.roomName);
     const users = getAllUsersInRoom(socket.roomName);
-    if (socket.id !== room.host) return;
+    if (requestIsNotFromHost(socket)) return;
 
     const { valid, error } = validateMaxRoomSize(newMaxRoomSize, users.length);
     if (!valid) return sendClientUnsuccessNotification(error);
