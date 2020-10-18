@@ -60,7 +60,6 @@ const App = () => {
 							path='/enter-passcode'
 							component={() => (
 								<JoinPageRoomPasscode
-									handleSetCredentials={handleSetCredentials}
 									socket={socket}
 									setAuthorized={setAuthorized}
 									username={info.username}

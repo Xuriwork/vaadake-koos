@@ -4,7 +4,7 @@ import { notyfError, notyfRedirecting } from '../utils/notyf';
 import { VERIFY_PASSCODE } from '../SocketActions';
 import { isEmpty } from '../utils/validators';
 
-const JoinPageRoomPasscode = ({ socket, setAuthorized, handleSetCredentials, roomName, username }) => {
+const JoinPageRoomPasscode = ({ socket, setAuthorized, roomName, username }) => {
     const history = useHistory();
     const [roomPasscode, setRoomPasscode] = useState('');
     const [error, setError] = useState(null);
