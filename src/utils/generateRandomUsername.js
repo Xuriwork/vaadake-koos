@@ -4,8 +4,8 @@ const getRandomInt = (characterLength) => {
 	return Math.floor(Math.random() * characterLength);
 };
 
-export const generateName = () => {
-	const firstName = [
+export const generateRandomUsername = () => {
+	const adjective = [
 		'abandoned',
 		'absolute',
 		'adorable',
@@ -143,7 +143,7 @@ export const generateName = () => {
 		'rocky',
 	];
 
-	const secondName = [
+	const animal = [
 		'aardvark',
 		'aardwolf',
 		'albatross',
@@ -242,6 +242,6 @@ export const generateName = () => {
 		'unicorn',
 	];
 
-	const name = `${capitalize(firstName[getRandomInt(firstName.length)])} ${capitalize(secondName[getRandomInt(secondName.length)])}`;
+	const name = `${capitalize(adjective[getRandomInt(adjective.length)])} ${capitalize(animal[getRandomInt(animal.length)])}`;
 	return name;
 };
