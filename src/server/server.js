@@ -86,11 +86,7 @@ io.on('connection', (socket) => {
 
   socket.on(CHECK_IF_ROOM_REQUIRES_PASSCODE, (roomName, callback) => {
     const room = getRoomByName(roomName);
-    
-    if (room && room.passcode) {
-      return callback(true);
-    };
-
+    if (room && room.passcode) return callback(true);
     callback(false);
   });
 
@@ -114,32 +110,30 @@ io.on('connection', (socket) => {
   });
 
   socket.on(JOIN, ({ username, roomName }) => {
-    const room = getRoomByName(roomName);
-
-    const { user } = addUser({ id: socket.id, username, roomName });
-
     socket.leaveAll();
-    socket.join(user.roomName);
+
+    addUser({ id: socket.id, username, roomName });
+
+    const users = getAllUsersInRoom(roomName);
+    const room = getRoomByName(roomName);
+    if (!room) addRoom({ name: roomName, host: users[0].id, roomId: shortid.generate() });
+    const { host } = getRoomByName(roomName);
+
+    socket.join(roomName);
+    socket.roomName = roomName;
     
-    socket.roomName = user.roomName;
-    
-    io.in(user.roomName).emit(MESSAGE, {
+    io.in(roomName).emit(MESSAGE, {
       type: 'SERVER-USER_JOINED',
-      content: `${user.username} joined the room. 👋`
+      content: `${username} joined the room. 👋`
     });
     
-    socket.to(user.roomName).emit(NEW_USER_JOINED);
+    socket.to(roomName).emit(NEW_USER_JOINED);
     
-    const users = getAllUsersInRoom(user.roomName);
-    if (!room) addRoom({ name: user.roomName, host: users[0].id, roomId: shortid.generate() });
-
-    const { host } = getRoomByName(user.roomName);
-
     socket.emit(SET_HOST, host);
-    io.in(user.roomName).emit(GET_USERS, users);
+    io.in(roomName).emit(GET_USERS, users);
 
     const { maxRoomSize, roomId } = getRoomByName(socket.roomName);
-    io.in(user.roomName).emit('GET_ROOM_INFO', { maxRoomSize, roomId });
+    io.in(roomName).emit('GET_ROOM_INFO', { maxRoomSize, roomId });
   });
 
   socket.on(GET_ROOM_CODE, () => {
