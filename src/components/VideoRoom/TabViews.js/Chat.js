@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import DownArrowIcon from '../../../assets/icons/arrow-down-circle-fill.svg';
 
-const Chat = ({ messages, sendMessage, users, socket, host }) => {
+const Chat = ({ messages, sendMessage, socket }) => {
 	const [message, setMessage] = useState('');
 	const [newMessagePopup, setNewMessagePopup] = useState(false);
 	const chatContainerRef = useRef(null);
