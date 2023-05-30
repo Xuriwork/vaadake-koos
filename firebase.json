@@ -28,10 +28,6 @@
             "value": "default-src https:; script-src https: 'unsafe-inline'; style-src https: 'unsafe-inline'; connect-src wss://vaadake-koos-server-render.onrender.com https:;"
           },
           {
-            "key": "Permissions-Policy",
-            "value": "vibrate 'none'; geolocation 'none';"
-          },
-          {
             "key": "Referrer-Policy",
             "value": "no-referrer"
           }
